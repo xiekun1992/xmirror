@@ -1,0 +1,30 @@
+{
+  "name": "xmirror",
+  "version": "0.0.0",
+  "description": "a tool for designer",
+  "bin": {
+    "xmirror": "./bin/xmirror"
+  },
+  "main": "./src/xmirror.js",
+  "scripts": {
+    "test": "node xmirror.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiekun1992/xmirror.git"
+  },
+  "author": "xiekun1992",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xiekun1992/xmirror/issues"
+  },
+  "homepage": "https://github.com/xiekun1992/xmirror#readme",
+  "dependencies": {
+    "colors": "^1.1.2"
+  },
+  "devDependencies": {
+    "karma": "^0.13.22",
+    "karma-chrome-launcher": "^0.2.3",
+    "karma-jasmine": "^0.3.8"
+  }
+}
