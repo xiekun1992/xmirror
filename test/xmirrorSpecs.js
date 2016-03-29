@@ -12,6 +12,7 @@ describe('when set workplace, ',function(){
 	});
 	it('the path should be set up if not existed',function(){
 		xmirror.setWorkplace('D:\\xmirror_workspace');
+		expect('D:\\xmirror_workspace').toBeExistedPath();
 	});
 	afterAll(function(){
 		xmirror=null;

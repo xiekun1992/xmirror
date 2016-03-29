@@ -15,9 +15,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './src',
-      './',
-      './test'
+      './src/**/*.js',
+      './*.js',
+      './test/**/**.js'
     ],
 
 
@@ -38,7 +38,11 @@ module.exports = function(config) {
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
     reporters: ['progress'],
 
-
+    plugins:[
+        // require('jasmine-core'),
+        require('karma-jasmine'),
+        require('karma-chrome-launcher')
+    ],
     // web server port
     port: 9876,
 
