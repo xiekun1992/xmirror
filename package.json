@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/xiekun1992/xmirror#readme",
   "dependencies": {
-    "colors": "^1.1.2"
+    "browser-launcher": "^1.0.0",
+    "colors": "^1.1.2",
+    "express": "^4.13.4"
   },
   "devDependencies": {
     "jasmine-core": "^2.4.1",

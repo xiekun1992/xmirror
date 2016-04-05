@@ -1,0 +1,22 @@
+{
+  "browsers": {
+    "local": [
+      {
+        "command": "C:\\Program Files\\Internet Explorer\\iexplore.exe",
+        "version": "8.0.7601.17514",
+        "windows": true,
+        "name": "ie",
+        "type": "ie",
+        "profile": false
+      },
+      {
+        "command": "C:\\Users\\sphinx\\Local Settings\\Application Data\\Google\\Chrome\\Application\\chrome.exe",
+        "version": "49.0.2623.75",
+        "name": "chrome",
+        "re": {},
+        "type": "chrome",
+        "profile": "undefined\\.config\\browser-launcher\\chrome-49.0.2623.75_0571fb19"
+      }
+    ]
+  }
+}

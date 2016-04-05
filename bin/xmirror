@@ -22,11 +22,11 @@ var showHelp=()=>{
 		'|                                                   |',
 		' ---------------------------------------------------'
 		].join('\n').green);
-	process.exit();
+	
 };
 showHelp();
 
-switch(args[1]){
-	case '-w':setWorkplace(args[2]);break;
-	default: openImageFile(args[2]);
-}
+// switch(args[1]){
+// 	case '-w':setWorkplace(args[2]);break;
+// 	default: openImageFile(args[2]);
+// }
