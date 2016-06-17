@@ -1,14 +1,14 @@
 {
-  "name": "app",
+  "name": "xmirror",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "asar pack . a.asar && electron a.asar"
+    "test": "asar pack .  xmirror.asar && electron ."
   },
-  "author": "",
+  "author": "xiekun1992",
   "license": "ISC",
-  "devDependencies": {
-    "electron-packager": "^7.0.4"
+  "dependencies": {
+    "font-awesome": "^4.6.3"
   }
 }

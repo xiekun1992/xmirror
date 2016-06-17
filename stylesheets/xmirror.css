@@ -1,0 +1,108 @@
+canvas{
+	/*border: 1px solid #000;*/
+    cursor: -webkit-grab;
+}
+.topbar{
+    margin-left:78px; 
+    height: 39px;
+    user-select:none;
+    -webkit-user-select:none;
+    -webkit-app-region:drag;
+}
+body{
+    overflow: hidden;
+	margin: 0;
+	padding: 0;
+	font-family: '微软雅黑';
+	background: #333;
+}
+#color{
+	position: absolute;
+	display: none;
+}
+#colorBox{
+    width: 12px;
+    height: 12px;
+    border: 2px solid #f00;
+    display: inline-block;
+    float: left;
+    position: relative;
+}
+#colorLine{
+    position: absolute;
+    height: 2px;
+    width: 14px;
+    top: -7px;
+    left: -13px;
+    background: #f00;
+    transform: rotateZ(45deg);
+}
+#colorValue{
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #f00;
+    font-family: cursive;
+    float: left;
+    margin-left: 5px;
+}
+#canvas{
+	/*background-color: #000;*/
+}
+#frontCanvas{
+	position: absolute;
+	top: 0;
+	left: 0;
+	display: none;
+}
+.dock>button.tool{
+	outline: none;
+	border: 1px solid transparent;
+	background: transparent;
+    padding: 10px 12px;
+    font-size: 30px;
+    cursor: pointer;
+}
+.dock>button.tool>i{
+    text-shadow: 0 0 4px #ccc;
+}
+.dock>button.tool:hover{
+	outline: none;
+    border: 1px solid #333;
+    background: linear-gradient(#3d3d3d 0,#545454 100%);
+    border-radius: 5px;
+}
+.dock{
+    text-align: center;
+    box-shadow: 0 0 10px #222;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    background: -webkit-linear-gradient(#636363 -6%,#535353 9%,#666666 91%,#636363 100%);
+    user-select:none;
+    -webkit-user-select:none;
+}
+.btns{
+    position: fixed;
+    z-index: 1;
+    top: 9px;
+    left: 10px;
+}
+span.btn {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-right: 5px;
+}
+.close{
+	background: #EE483D;
+}
+.max{
+	background: #EFA040;
+}
+.min{
+	background: #54BC22;
+}

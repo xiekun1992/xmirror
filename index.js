@@ -3,19 +3,20 @@ const {app}=electron;
 const {BrowserWindow}=electron;
 const {ipcMain}=electron;
 
-let mainWindow;
+let win;
 
 function createWindow(){
-	mainWindow=new BrowserWindow({
+	win=new BrowserWindow({
 		icon:'./favicon.ico',
 		width:1000,
 		height:700,
 		frame:false
 	});
-	mainWindow.loadURL(`file://${__dirname}/index.html`);
-	// mainWindow.webContents.openDevTools();
-	mainWindow.on('close',()=>{
-		mainWindow=null;
+	win.loadURL(`file://${__dirname}/index.html`);
+	// win.webContents.openDevTools();
+
+	win.on('closed',()=>{
+		win=null;
 	});
 }
 
@@ -28,21 +29,21 @@ app.on('window-all-closed',()=>{
 });
 
 app.on('activate',()=>{
-	if(mainWindow===null){
+	if(win===null){
 		createWindow();
 	}
 });
 
 ipcMain.on('x-close-window',(event)=>{
-	mainWindow.close();
+	win.close();
 })
 ipcMain.on('x-min-window',(event)=>{
-	mainWindow.minimize();
+	win.minimize();
 });
 ipcMain.on('x-max-window',(event)=>{
-	if(mainWindow.isMaximized()){
-		mainWindow.unmaximize();
+	if(win.isMaximized()){
+		win.unmaximize();
 	}else{
-		mainWindow.maximize();
+		win.maximize();
 	}
 })
