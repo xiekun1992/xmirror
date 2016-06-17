@@ -2,14 +2,325 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>欢迎使用xmirror</title>
+	<link rel="icon" type="image/x-icon" href="https://assets-cdn.github.com/favicon.ico">
+	<title>xmirror</title>
+	<style>
+	.dock{
+		-webkit-app-region:drag;
+	    background: #333;
+	    position: fixed;
+	    bottom: 0;
+	    width: 100%;
+	    height: 60px;
+	    box-shadow: 0 0 20px #555;
+	}
+	canvas{
+		/*border: 1px solid #ccc;*/
+	    cursor: -webkit-grab;
+	}
+	body{
+		margin: 0;
+		padding: 0;
+		font-style: '微软雅黑';
+	}
+	#color{
+		position: absolute;
+		display: none;
+	}
+	#colorBox{
+	    width: 12px;
+	    height: 12px;
+	    border: 2px solid #f00;
+	    display: inline-block;
+	    float: left;
+	    position: relative;
+	}
+	#colorLine{
+	    position: absolute;
+	    height: 2px;
+	    width: 14px;
+	    top: -7px;
+	    left: -13px;
+	    background: #f00;
+	    transform: rotateZ(45deg);
+	}
+	#colorValue{
+	    display: inline-block;
+	    font-size: 13px;
+	    font-weight: 700;
+	    color: #f00;
+	    font-family: cursive;
+	    float: left;
+	    margin-left: 5px;
+	}
+	#canvas{
+		background-color: #000;
+	}
+	#frontCanvas{
+		position: absolute;
+		top: 0;
+		left: 0;
+		display: none;
+	}
+	button{
+		margin:10px; 
+	}
+	span.btn {
+	    display: inline-block;
+	    width: 13px;
+	    height: 13px;
+	    border-radius: 50%;
+	    cursor: pointer;
+	    margin-right: 5px;
+	}
+	.close{
+		background: #EE483D;
+	}
+	.max{
+		background: #EFA040;
+	}
+	.min{
+		background: #54BC22;
+	}
+	</style>
 </head>
 <body>
-	<div>
-		<form action="/">
-			<input type="file">
-			<input type="submit" value="上传图片">
-		</form>
+	<div style="margin:10px;">
+		<span class="close btn" onclick="closeWin()"></span>
+		<span class="max btn" onclick="maxWin()"></span>
+		<span class="min btn" onclick="minWin()"></span>
 	</div>
+	<div style="position:relative;" id="layer">
+		<canvas id="frontCanvas"></canvas>
+		<canvas id="canvas"></canvas>
+	</div>
+	<div class="dock">
+		<button id="move" onclick="xmirror.move()">移动</button>
+		<button id="colorPicker" onclick="xmirror.colorPicker()">拾色器</button>
+	</div>
+	<script>
+	const ipcRenderer=require('electron').ipcRenderer;
+
+	function closeWin(){
+		ipcRenderer.send('x-close-window');
+	}
+	function minWin(){
+		ipcRenderer.send('x-min-window');
+	}
+	function maxWin(){
+		ipcRenderer.send('x-max-window');
+	}
+
+	var xmirror=new Xmirror('http://xiekun1992.github.io/1.png');
+	// xmirror.move();
+
+	function Xmirror(imgPath){
+		var _self=this;
+		// 画布容器
+		var layer=document.getElementById('layer'),
+			layerTop=layer.offsetTop,
+			layerLeft=layer.offsetLeft;
+
+		layer.addEventListener('mousewheel',function(e){
+			e.stopPropagation();
+			e.preventDefault();
+		});
+		// 获取展示用的画布和操作用的画布
+		// 采用双图层避免操作的时候清空原画布的内容
+		var c=document.getElementById('canvas');
+		var fc=document.getElementById('frontCanvas');
+		fc.height=c.height=650;
+		fc.width=c.width=1000;
+		var ctx=c.getContext('2d');
+		var fctx=fc.getContext('2d');
+		// 移动和缩放图片的变量
+		var scale=1,scaleDelta=0.9,imgDeltaX=10,imgDeltaY=10;
+
+		// 初始化图片
+		this.drawImage=function(){
+			ctx.clearRect(0,0,c.width,c.height);
+			ctx.drawImage(img,0,0,img.width,img.height,imgDeltaX,imgDeltaY,img.width*scale,img.height*scale);
+			if(annotations.length>0){
+				for(var i=0;i<annotations.length;i++){
+					annotations[i].draw(imgDeltaX,imgDeltaY,scale);
+				}
+			}
+		};
+		var img=new Image();
+		img.src=imgPath;
+		img.onload=function(){
+			_self.drawImage();
+			_self.move();
+		};
+		/*window.onbeforeunload=function(e){
+			return e.returnValue='离开或重新加载当前页面会导致当前保存的内容被清空';
+		}*/
+		// 记录原画布上的标注以便画布清空后重绘
+		var annotations=[];
+		// 只有cover,move函数能直接操作原画布，其他操作都在frontCanvas画布上进行操作，其结果将反映到原画布
+		// 保存操作前的画布内容的副本，并将操作画布产生的工作路径绘制到原画布上
+		this.cover=function(annotation){
+			annotations.push(annotation);
+			annotation.draw();
+		};
+
+		this.move=function(){
+			// 注销其他操作按钮产生的监听事件
+			fc.onclick=fc.onmousemove=fc.onmousedown=fc.onmouseout=null;
+
+			// 原地放大
+			function scaleUp(e){
+				if(scale<scaleDelta*100){
+					scale/=scaleDelta;
+					imgDeltaX-=img.width*(scale-scale*scaleDelta)/2;
+					imgDeltaY-=img.height*(scale-scale*scaleDelta)/2;
+					_self.drawImage();
+				}
+			}
+			// 原地缩小
+			function scaleDown(e){
+				if(scale>scaleDelta/10){
+					scale*=scaleDelta;
+					imgDeltaX+=img.width*(scale/scaleDelta-scale)/2;
+					imgDeltaY+=img.height*(scale/scaleDelta-scale)/2;
+					_self.drawImage();
+				}
+			}
+			// 移动按钮
+			fc.style.display='none';//隐藏操作用的画布
+			c.onmousewheel=function(e){
+				if(e.wheelDelta){//IE/Opera/Chrome
+					if(e.wheelDelta==120){//向上滚动
+						scaleUp(e);
+					}else{//向下滚动
+						scaleDown(e);
+					}
+				}else if(e.detail){
+					if(e.detail==-3){//向上滚动
+						scaleUp(e);
+					}else{//向下滚动
+						scaleDown(e);
+					}
+				}
+				e.stopPropagation();
+			};
+			c.onmousedown=function(e){
+				c.style.cursor='-webkit-grabbing';
+				var clickX=e.clientX,clickY=e.clientY;
+				var mousemovefn=function(e){
+					// c.style.cursor='-webkit-grabbing';
+					if(clickX<e.clientX){//向右
+						imgDeltaX+=e.clientX-clickX;
+					}else{//向左
+						imgDeltaX-=clickX-e.clientX;
+					}
+					if(clickY<e.clientY){//向下
+						imgDeltaY+=e.clientY-clickY;
+					}else{//向上
+						imgDeltaY-=clickY-e.clientY;
+					}
+					clickX=e.clientX;
+					clickY=e.clientY;
+					_self.drawImage();
+				};
+				c.addEventListener('mousemove',mousemovefn);
+				c.addEventListener('mouseup',function(){
+					c.style.cursor='-webkit-grab';
+					c.removeEventListener('mousemove',mousemovefn);
+				});
+			};
+		};
+
+		this.colorPicker=function(){
+			// 拾色器功能（禁用其他功能）
+			var canvasOffsetLeft=c.offsetLeft,canvasOffsetTop=c.offsetTop;
+			function rgb2Hex(rgb){
+				var hex='#';
+				for(var i=0;i<3;i++){
+					hex+=('0'+(rgb[i]).toString(16)).substr(-2);
+				}
+				return hex;
+			}
+			// 在frontCanvas图层上画出拾色器标识
+			var pixel,hexValue,xsign,ysign,deltaX,deltaY,colorRulerX,colorRulerY,annotation;
+			function colorPickerFrame(e){
+				fctx.clearRect(0,0,fc.width,fc.height);
+				xsign=1;
+				ysign=-1;
+				deltaX=0;//拾色器hex值在左侧时的x偏移量
+				deltaY=0;//拾色器hex值在下侧时的x偏移量
+				colorRulerX=e.clientX-layerLeft;
+				colorRulerY=e.clientY-layerTop;
+				pixel=ctx.getImageData(colorRulerX,colorRulerY,1,1);
+				hexValue=rgb2Hex(pixel.data);
+				// 判断鼠标所在位置确定标注的显示位置（默认在右上显示）
+				if(layerLeft+fc.width-e.clientX<100){//离右边界太近，水平xsign取相反数
+					xsign*=-1;
+					deltaX=-55;
+				}
+				if(e.clientY-layerTop<20){//离上边界太近，垂直ysign取相反数
+					ysign*=-1;
+					deltaY=11;
+				}
+				new Annotation({
+					context:fctx,
+					colorRulerX:colorRulerX,
+					colorRulerY:colorRulerY,
+					xsign:xsign,
+					ysign:ysign,
+					deltaX:deltaX,
+					deltaY:deltaY,
+					hexValue:hexValue},imgDeltaX,imgDeltaY).draw();
+			}
+			function Annotation(params,originImageOffsetX,originImageOffsetY){
+				this.draw=function(offsetX,offsetY,scale){
+					offsetX=offsetX-originImageOffsetX||0;
+					offsetY=offsetY-originImageOffsetY||0;
+					scale=scale||1;
+					params.context.beginPath();
+					params.context.moveTo(offsetX+scale*(params.colorRulerX),offsetY+scale*(params.colorRulerY));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*10),offsetY+scale*(params.colorRulerY+params.ysign*10));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*20),offsetY+scale*(params.colorRulerY+params.ysign*10));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*20),offsetY+scale*(params.colorRulerY+params.ysign*17));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*35),offsetY+scale*(params.colorRulerY+params.ysign*17));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*35),offsetY+scale*(params.colorRulerY+params.ysign*2));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*20),offsetY+scale*(params.colorRulerY+params.ysign*2));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*20),offsetY+scale*(params.colorRulerY+params.ysign*10));
+					params.context.lineTo(offsetX+scale*(params.colorRulerX+params.xsign*10),offsetY+scale*(params.colorRulerY+params.ysign*10));
+					params.context.closePath();
+					params.context.strokeStyle='#f00';
+					params.context.stroke();
+					params.context.fillStyle=params.hexValue;
+					params.context.fill();
+					params.context.stroke();
+					params.context.fillStyle='#f00';
+					params.context.font='bolder 15px Arial';
+					params.context.fillText(params.hexValue,scale*(params.colorRulerX+params.xsign*40+params.deltaX)+offsetX,scale*(params.colorRulerY+params.ysign*4+params.deltaY)+offsetY);
+
+				};
+			}
+
+			// 拾色器按钮
+			fc.style.cursor='none';
+			fc.style.display='block';//显示操作图层
+			fc.onmousemove=colorPickerFrame;
+			fc.onclick=function(){
+				_self.cover(new Annotation({
+					context:ctx,
+					colorRulerX:colorRulerX,
+					colorRulerY:colorRulerY,
+					xsign:xsign,
+					ysign:ysign,
+					deltaX:deltaX,
+					deltaY:deltaY,
+					hexValue:hexValue},imgDeltaX,imgDeltaY));
+			};
+		};
+	};
+
+
+
+	
+	</script>
 </body>
 </html>

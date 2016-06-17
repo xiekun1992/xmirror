@@ -1,33 +1,14 @@
 {
-  "name": "xmirror",
-  "version": "0.0.0",
-  "description": "a tool for designer",
-  "bin": {
-    "xmirror": "./bin/xmirror"
-  },
-  "main": "./src/xmirror.js",
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "test": "node xmirror.js"
+    "test": "asar pack . a.asar && electron a.asar"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/xiekun1992/xmirror.git"
-  },
-  "author": "xiekun1992",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/xiekun1992/xmirror/issues"
-  },
-  "homepage": "https://github.com/xiekun1992/xmirror#readme",
-  "dependencies": {
-    "browser-launcher": "^1.0.0",
-    "colors": "^1.1.2",
-    "express": "^4.13.4"
-  },
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "jasmine-core": "^2.4.1",
-    "karma": "^0.13.22",
-    "karma-chrome-launcher": "^0.2.3",
-    "karma-jasmine": "^0.3.8"
+    "electron-packager": "^7.0.4"
   }
 }
