@@ -214,5 +214,29 @@ function Xmirror(imgPath){
 				deltaY:deltaY,
 				hexValue:hexValue},imgDeltaX,imgDeltaY));
 		};
+
+
+
 	};
+
+
+	this.openFolder=function(){
+
+	}
 };
+
+
+
+const holder=document.getElementsByTagName('body')[0];
+holder.ondragover=()=>{
+	return false;
+}
+holder.ondragleave=()=>{
+	return false;
+}
+holder.ondrop=(e)=>{
+	e.preventDefault();
+	const file=e.dataTransfer.files[0];
+	console.log(`File you dragged here is `,file.path);
+	return false;
+}

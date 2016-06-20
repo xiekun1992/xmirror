@@ -13,7 +13,7 @@ function createWindow(){
 		frame:false
 	});
 	win.loadURL(`file://${__dirname}/index.html`);
-	// win.webContents.openDevTools();
+	win.webContents.openDevTools();
 
 	win.on('closed',()=>{
 		win=null;
