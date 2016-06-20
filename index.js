@@ -4,16 +4,19 @@ const {BrowserWindow}=electron;
 const {ipcMain}=electron;
 const {dialog}=electron;
 
-let win;
 
-var fs=require('fs');
+let win;
 
 function createWindow(){
 	win=new BrowserWindow({
 		icon:'./favicon.ico',
 		width:1000,
 		height:700,
-		frame:false
+		frame:false,
+		title:'xmirror',
+		minWidth:800,
+		minHeight:600,
+		center:true
 	});
 	win.loadURL(`file://${__dirname}/index.html`);
 	// win.webContents.openDevTools();
@@ -49,7 +52,7 @@ ipcMain.on('x-max-window',(event)=>{
 	}else{
 		win.maximize();
 	}
-})
+});
 
 ipcMain.on('x-open-dialog',(event)=>{
 	let imgPath=dialog.showOpenDialog({
@@ -58,7 +61,8 @@ ipcMain.on('x-open-dialog',(event)=>{
 		filters:[
 			{name:'Images',extensions:['jpg','png','gif','bmp']}
 		]
-	}).shift();
-
-	event.sender.send('x-open-dialog-imgpath',{path:imgPath});
-})
+	});
+	if(imgPath && imgPath.length>0){
+		event.sender.send('x-open-dialog-imgpath',{path:imgPath.shift()});
+	}
+});

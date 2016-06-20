@@ -1,4 +1,5 @@
 const ipcRenderer=require('electron').ipcRenderer;
+const {desktopCapturer}=require('electron');
 
 function closeWin(){
 	ipcRenderer.send('x-close-window');
@@ -14,7 +15,39 @@ function openDialog(){
 }
 ipcRenderer.on('x-open-dialog-imgpath',(e,data)=>{
 	xmirror=new Xmirror(data.path);
-})
+});
+function screenCapture(){
+	console.log(desktopCapturer);
+	desktopCapturer.getSources({types:['screen']},(error,sources)=>{
+		if(error) throw error;
+		for(let i=0;i<sources.length;i++){
+			if(sources[i].name==='Entire screen'){
+				navigator.webkitGetUserMedia({
+					audio:false,
+					video:{
+						mandatory:{
+							chromeMediaSource:'desktop',
+							chromeMediaSourceId:sources[i].id,
+							minWidth:window.screen.availWidth,
+							maxWidth:window.screen.availWidth,
+							minHeight:window.screen.availHeight,
+							maxHeight:window.screen.availHeight
+						}
+					}
+				},(stream)=>{
+					let video=document.querySelector("#video");
+					video.src=URL.createObjectURL(stream);
+					let canvas=document.querySelector('#videoPic');
+					let ctx=canvas.getContext('2d');
+					ctx.drawImage(video,0,0);
+					xmirror=new Xmirror(canvas.toDataURL('image/png'));
+				},(error)=>{
+					console.log('getUserMediaError');
+				});
+			}
+		}
+	});
+}
 
 var xmirror;
 // xmirror.move();
@@ -34,6 +67,7 @@ function Xmirror(imgPath){
 	// 采用双图层避免操作的时候清空原画布的内容
 	var c=document.getElementById('canvas');
 	var fc=document.getElementById('frontCanvas');
+	c.style.display='block';
 	fc.height=c.height=window.screen.availHeight;
 	fc.width=c.width=window.screen.availWidth;
 	var ctx=c.getContext('2d');
@@ -234,18 +268,21 @@ function Xmirror(imgPath){
 
 
 const holder=document.getElementsByTagName('body')[0];
+// 设置body高度防止第一次拖拽打开图片失败
 holder.style.height=window.screen.availHeight+'px';
+
 holder.ondragover=holder.ondragenter=(e)=>{
 	e.preventDefault();
 	return false;
-}
+};
 holder.ondragleave=()=>{
 	return false;
-}
+};
 holder.ondrop=(e)=>{
 	e.preventDefault();
 	const file=e.dataTransfer.files[0];
 	console.log(`File you dragged here is `,file.path);
 	xmirror=new Xmirror(file.path);
 	return false;
-}
+};
+
