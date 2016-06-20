@@ -2,8 +2,11 @@ const electron=require('electron');
 const {app}=electron;
 const {BrowserWindow}=electron;
 const {ipcMain}=electron;
+const {dialog}=electron;
 
 let win;
+
+var fs=require('fs');
 
 function createWindow(){
 	win=new BrowserWindow({
@@ -13,7 +16,7 @@ function createWindow(){
 		frame:false
 	});
 	win.loadURL(`file://${__dirname}/index.html`);
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 
 	win.on('closed',()=>{
 		win=null;
@@ -46,4 +49,16 @@ ipcMain.on('x-max-window',(event)=>{
 	}else{
 		win.maximize();
 	}
+})
+
+ipcMain.on('x-open-dialog',(event)=>{
+	let imgPath=dialog.showOpenDialog({
+		properties:['openFile'],
+		title:'选择图片',
+		filters:[
+			{name:'Images',extensions:['jpg','png','gif','bmp']}
+		]
+	}).shift();
+
+	event.sender.send('x-open-dialog-imgpath',{path:imgPath});
 })

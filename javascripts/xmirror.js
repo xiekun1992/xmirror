@@ -9,8 +9,14 @@ function minWin(){
 function maxWin(){
 	ipcRenderer.send('x-max-window');
 }
+function openDialog(){
+	ipcRenderer.send('x-open-dialog');
+}
+ipcRenderer.on('x-open-dialog-imgpath',(e,data)=>{
+	var xmirror=new Xmirror(data.path);
+})
 
-var xmirror=new Xmirror('http://xiekun1992.github.io/1.png');
+
 // xmirror.move();
 
 function Xmirror(imgPath){
@@ -228,7 +234,8 @@ function Xmirror(imgPath){
 
 
 const holder=document.getElementsByTagName('body')[0];
-holder.ondragover=()=>{
+holder.ondragover=(e)=>{
+	e.preventDefault();
 	return false;
 }
 holder.ondragleave=()=>{
@@ -238,5 +245,6 @@ holder.ondrop=(e)=>{
 	e.preventDefault();
 	const file=e.dataTransfer.files[0];
 	console.log(`File you dragged here is `,file.path);
+	var xmirror=new Xmirror(file.path);
 	return false;
 }
