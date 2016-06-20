@@ -13,10 +13,10 @@ function openDialog(){
 	ipcRenderer.send('x-open-dialog');
 }
 ipcRenderer.on('x-open-dialog-imgpath',(e,data)=>{
-	var xmirror=new Xmirror(data.path);
+	xmirror=new Xmirror(data.path);
 })
 
-
+var xmirror;
 // xmirror.move();
 
 function Xmirror(imgPath){
@@ -34,8 +34,8 @@ function Xmirror(imgPath){
 	// 采用双图层避免操作的时候清空原画布的内容
 	var c=document.getElementById('canvas');
 	var fc=document.getElementById('frontCanvas');
-	fc.height=c.height=500;
-	fc.width=c.width=1000;
+	fc.height=c.height=window.screen.availHeight;
+	fc.width=c.width=window.screen.availWidth;
 	var ctx=c.getContext('2d');
 	var fctx=fc.getContext('2d');
 	// 移动和缩放图片的变量
@@ -234,7 +234,8 @@ function Xmirror(imgPath){
 
 
 const holder=document.getElementsByTagName('body')[0];
-holder.ondragover=(e)=>{
+holder.style.height=window.screen.availHeight+'px';
+holder.ondragover=holder.ondragenter=(e)=>{
 	e.preventDefault();
 	return false;
 }
@@ -245,6 +246,6 @@ holder.ondrop=(e)=>{
 	e.preventDefault();
 	const file=e.dataTransfer.files[0];
 	console.log(`File you dragged here is `,file.path);
-	var xmirror=new Xmirror(file.path);
+	xmirror=new Xmirror(file.path);
 	return false;
 }
