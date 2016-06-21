@@ -40,16 +40,17 @@ holder.ondrop=(e)=>{
 
 // 截屏导入图片
 function screenCapture(){
-	console.log(desktopCapturer);
-	desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.availWidth,height:window.screen.availHeight}},(error,sources)=>{
-		if(error) throw error;
-		for(let i=0;i<sources.length;i++){
-			if(sources[i].name.toLowerCase()==='entire screen'){
-				warningMention.init(sources[i].thumbnail.toDataURL());
-				return ;
-			}
-		}
-	});
+	ipcRenderer.send('x-screen-capture');
+	// desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.availWidth,height:window.screen.availHeight}},(error,sources)=>{
+	// 	if(error) throw error;
+	// 	for(let i=0;i<sources.length;i++){
+	// 		if(sources[i].name.toLowerCase()==='entire screen'){
+	// 			// warningMention.init(sources[i].thumbnail.toDataURL());
+	// 			ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
+	// 			return ;
+	// 		}
+	// 	}
+	// });
 }
 
 const warningMention={

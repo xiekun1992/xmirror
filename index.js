@@ -20,7 +20,7 @@ function createWindow(){
 	});
 	win.loadURL(`file://${__dirname}/index.html`);
 	
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 
 	win.on('closed',()=>{
 		win=null;
@@ -66,4 +66,23 @@ ipcMain.on('x-open-dialog',(event)=>{
 	if(imgPath && imgPath.length>0){
 		event.sender.send('x-open-dialog-imgpath',{path:imgPath.shift()});
 	}
+});
+
+let tmpWindow;
+ipcMain.on('x-screen-capture',()=>{
+	// 用于屏幕捕获
+	tmpWindow=new BrowserWindow({
+		// width:1366,
+		// height:1000,
+		alwaysOnTop:true,
+		fullscreen:true,
+		resizable:false,
+		movable:false,
+		closable:false,
+		frame:false,
+		transparent:true
+	});
+});
+ipcMain.on('x-screen-capture-picture',(event,data)=>{
+	tmpWindow.loadURL(`file://${__dirname}/partial/capture.html`);
 });
