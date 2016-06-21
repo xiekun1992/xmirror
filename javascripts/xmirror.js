@@ -13,41 +13,79 @@ function maxWin(){
 function openDialog(){
 	ipcRenderer.send('x-open-dialog');
 }
+
+// 点击按钮导入图片
 ipcRenderer.on('x-open-dialog-imgpath',(e,data)=>{
-	xmirror=new Xmirror(data.path);
+	warningMention.init(data.path);
 });
+
+// 拖拽导入图片
+const holder=document.getElementsByTagName('body')[0];
+// 设置body高度防止第一次拖拽打开图片失败
+holder.style.height=window.screen.availHeight+'px';
+
+holder.ondragover=holder.ondragenter=(e)=>{
+	e.preventDefault();
+	return false;
+};
+holder.ondragleave=()=>{
+	return false;
+};
+holder.ondrop=(e)=>{
+	e.preventDefault();
+	const file=e.dataTransfer.files[0];
+	warningMention.init(file.path);
+	return false;
+};
+
+// 截屏导入图片
 function screenCapture(){
 	console.log(desktopCapturer);
-	desktopCapturer.getSources({types:['screen']},(error,sources)=>{
+	desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.availWidth,height:window.screen.availHeight}},(error,sources)=>{
 		if(error) throw error;
 		for(let i=0;i<sources.length;i++){
-			if(sources[i].name==='Entire screen'){
-				navigator.webkitGetUserMedia({
-					audio:false,
-					video:{
-						mandatory:{
-							chromeMediaSource:'desktop',
-							chromeMediaSourceId:sources[i].id,
-							minWidth:window.screen.availWidth,
-							maxWidth:window.screen.availWidth,
-							minHeight:window.screen.availHeight,
-							maxHeight:window.screen.availHeight
-						}
-					}
-				},(stream)=>{
-					let video=document.querySelector("#video");
-					video.src=URL.createObjectURL(stream);
-					let canvas=document.querySelector('#videoPic');
-					let ctx=canvas.getContext('2d');
-					ctx.drawImage(video,0,0);
-					xmirror=new Xmirror(canvas.toDataURL('image/png'));
-				},(error)=>{
-					console.log('getUserMediaError');
-				});
+			if(sources[i].name.toLowerCase()==='entire screen'){
+				warningMention.init(sources[i].thumbnail.toDataURL());
+				return ;
 			}
 		}
 	});
 }
+
+const warningMention={
+	firstInit:false,
+	dom:document.querySelector('#warning'),
+	url:'',
+	text:'重新导入图片将覆盖原有图片，是否继续导入图片？',
+	title:'警告',
+	init:function(url){
+		this.url=url;
+		if(!this.firstInit){
+			this.confirm();
+			this.firstInit=true;
+			return ;
+		}
+		this.dom.style.display='block';
+		this.dom.childNodes[1].childNodes[1].childNodes[1].innerHTML=this.title;
+		this.dom.childNodes[1].childNodes[1].childNodes[3].innerHTML=this.text;
+	},
+	confirm:function(){
+		xmirror=new Xmirror(this.url);
+		let childNodes=document.querySelector("#tooltip").childNodes;
+		childNodes.forEach(function(o,i){
+			if(o.nodeName.toLowerCase()==='button'){
+				o.removeAttribute('disabled');
+			}
+		})
+		xmirror.move(document.querySelector('#move'));
+		this.dom.style.display='none';
+	},
+	cancel:function(){
+		this.dom.style.display='none';
+	}
+}
+
+
 
 var xmirror;
 // xmirror.move();
@@ -75,6 +113,17 @@ function Xmirror(imgPath){
 	// 移动和缩放图片的变量
 	var scale=1,scaleDelta=0.9,imgDeltaX=10,imgDeltaY=10;
 
+	this.setActiveClass=function(domtThis){
+		if(domtThis){
+			var childNodes=domtThis.parentNode.childNodes;
+			childNodes.forEach(function(o,i){
+				if(o.nodeName!=='#text' && o.nodeName!=='#comment'){
+					o.classList.remove('active');
+				}
+			});
+			domtThis.classList.add('active');
+		}
+	}
 	// 初始化图片
 	this.drawImage=function(){
 		ctx.clearRect(0,0,c.width,c.height);
@@ -103,7 +152,8 @@ function Xmirror(imgPath){
 		annotation.draw();
 	};
 
-	this.move=function(){
+	this.move=function(domtThis){
+		this.setActiveClass(domtThis);
 		// 注销其他操作按钮产生的监听事件
 		fc.onclick=fc.onmousemove=fc.onmousedown=fc.onmouseout=null;
 
@@ -170,7 +220,8 @@ function Xmirror(imgPath){
 		};
 	};
 
-	this.colorPicker=function(){
+	this.colorPicker=function(domtThis){
+		this.setActiveClass(domtThis);
 		// 拾色器功能（禁用其他功能）
 		var canvasOffsetLeft=c.offsetLeft,canvasOffsetTop=c.offsetTop;
 		function rgb2Hex(rgb){
@@ -267,22 +318,4 @@ function Xmirror(imgPath){
 
 
 
-const holder=document.getElementsByTagName('body')[0];
-// 设置body高度防止第一次拖拽打开图片失败
-holder.style.height=window.screen.availHeight+'px';
-
-holder.ondragover=holder.ondragenter=(e)=>{
-	e.preventDefault();
-	return false;
-};
-holder.ondragleave=()=>{
-	return false;
-};
-holder.ondrop=(e)=>{
-	e.preventDefault();
-	const file=e.dataTransfer.files[0];
-	console.log(`File you dragged here is `,file.path);
-	xmirror=new Xmirror(file.path);
-	return false;
-};
 

@@ -10,42 +10,60 @@
 	<div class="topbar">
 		<div class="btns">
 			<span class="close btn" onclick="closeWin()" title="关闭"></span>
-			<span class="max btn" onclick="maxWin()" title="最大化"></span>
 			<span class="min btn" onclick="minWin()" title="最小化"></span>
+			<span class="max btn" onclick="maxWin()" title="最大化"></span>
 		</div>
 	</div>
+	<!-- <img src="" id="img"> -->
+	<!-- <video id="video" style="display:none;"></video> -->
+	<!-- <canvas id="videoPic" style="display:none;"></canvas> -->
 	<div style="position:relative;overflow:hidden;" id="layer">
 		<canvas id="frontCanvas"></canvas>
 		<canvas id="canvas"></canvas>
 	</div>
-	<video id="video"></video>
-	<canvas id="videoPic" style="display:none;"></canvas>
-	<div class="dock">
+	<div class="dock" id="tooltip">
 		<!-- 打开 -->
 		<button class="tool l" title="打开" onclick="openDialog()"><i class="fa fa-folder-open-o" aria-hidden="true"></i></button>
 		<!-- 截屏 -->
 		<button class="tool l" title="截屏" onclick="screenCapture()"><i class="fa fa-crop" aria-hidden="true"></i></button>
 		<!-- 保存 -->
-		<button class="tool l" title="保存" onclick="openDialog()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+		<button disabled="disabled" class="tool l" title="保存" onclick="openDialog()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
 		<!-- 撤销 -->
-		<button class="tool l" title="撤销"><i class="fa fa-undo" aria-hidden="true"></i></i></button>
+		<button disabled="disabled" class="tool l" title="撤销"><i class="fa fa-undo" aria-hidden="true"></i></i></button>
 		<!-- 重做 -->
-		<button class="tool l" title="重做"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+		<button disabled="disabled" class="tool l" title="重做"><i class="fa fa-repeat" aria-hidden="true"></i></button>
 		<!-- 尺标 -->
-		<button class="tool" title="尺标"><i class="fa fa-arrows-h" aria-hidden="true"></i></button>
+		<button disabled="disabled" class="tool" title="尺标"><i class="fa fa-arrows-h" aria-hidden="true"></i></button>
 		<!-- 坐标 -->
-		<button class="tool" title="坐标"><i class="fa fa-arrows" aria-hidden="true"></i></button>
+		<button disabled="disabled" class="tool" title="坐标"><i class="fa fa-arrows" aria-hidden="true"></i></button>
 		<!-- 拾色器 -->
-		<button id="colorPicker" class="tool" onclick="xmirror.colorPicker()" title="拾色器"><i class="fa fa-eyedropper" aria-hidden="true"></i></button>
+		<button disabled="disabled" id="colorPicker" class="tool" onclick="xmirror.colorPicker(this)" title="拾色器"><i class="fa fa-eyedropper" aria-hidden="true"></i></button>
 		<!-- 标注 -->
-		<button  class="tool" title="标注"><i class="fa fa-font" aria-hidden="true"></i></button>
+		<button disabled="disabled"  class="tool" title="标注"><i class="fa fa-font" aria-hidden="true"></i></button>
 		<!-- 移动 -->
-		<button id="move" class="tool" onclick="xmirror.move()" title="移动"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></button>
+		<button disabled="disabled" id="move" class="tool" onclick="xmirror.move(this)" title="移动"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></button>
 		<!-- 缩小 -->
-		<button  class="tool r" title="缩小"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
+		<button disabled="disabled"  class="tool r" title="缩小"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
 		<!-- 放大 -->
-		<button  class="tool r" title="放大"><i class="fa fa-search-plus" aria-hidden="true"></i></button>
+		<button disabled="disabled"  class="tool r" title="放大"><i class="fa fa-search-plus" aria-hidden="true"></i></button>
 		
+	</div>
+	<!-- 弹出框 -->
+	<div class="modal-bg" id="warning">
+		<article class="modal">
+			<section>
+				<header>
+					警告
+				</header>
+				<p>
+					重新导入图片将覆盖原有图片，是否继续导入图片？
+				</p>
+				<footer>
+					<button class="xbtn" onclick="warningMention.confirm()">继续</button>
+					<button class="xbtn" onclick="warningMention.cancel()">取消</button>
+				</footer>
+			</section>
+		</article>
 	</div>
 	<script src="./javascripts/xmirror.js"></script>
 </body>

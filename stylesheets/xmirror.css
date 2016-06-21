@@ -10,6 +10,7 @@ canvas{
     -webkit-app-region:drag;
 }
 body{
+    position: relative;
     overflow: hidden;
 	margin: 0;
 	padding: 0;
@@ -18,6 +19,7 @@ body{
 }
 *{
     box-sizing:border-box;
+    font-family: '微软雅黑';
 }
 #color{
 	position: absolute;
@@ -64,17 +66,26 @@ body{
 	border: 1px solid transparent;
 	background: transparent;
     padding: 10px 12px;
-    font-size: 30px;
+    font-size: 25px;
     cursor: pointer;
 }
 .dock>button.tool>i{
     text-shadow: 0 0 4px #ccc;
 }
+.dock>button.tool.active,
 .dock>button.tool:hover{
-	outline: none;
+    outline: none;
     border: 1px solid #333;
     background: linear-gradient(#3d3d3d 0,#545454 100%);
     border-radius: 5px;
+}
+.dock>button[disabled=disabled].tool{
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: not-allowed;
+}
+.dock>button[disabled=disabled].tool>i{
+    text-shadow: none;
 }
 .dock{
     text-align: center;
@@ -105,14 +116,50 @@ span.btn {
 	background: #EE483D;
 }
 .max{
-	background: #EFA040;
+    background: #54BC22;
 }
 .min{
-	background: #54BC22;
+	background: #EFA040;
 }
 .l{
     float: left;
 }
 .r{
     float: right;
+}
+.xbtn{
+    border: 0;
+    padding: 5px 20px;
+    background-color: #333;
+    color: #ddd;
+    outline: none;
+    cursor: pointer;
+}
+.modal-bg{
+    left: 0;
+    top: 0;
+    display: none;
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal{
+    width: 400px;
+    background-color: #444;
+    margin: 100px auto;
+    color: #ddd;
+}
+.modal footer{
+    padding: 10px;
+    text-align: right;
+}
+.modal p{
+    font-size: 14px;
+    padding: 10px;
+}
+.modal header{
+    font-size: 14px;
+    padding: 10px;
+    background-color: #666;
 }
