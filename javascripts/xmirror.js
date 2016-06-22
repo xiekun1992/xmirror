@@ -41,15 +41,18 @@ holder.ondrop=(e)=>{
 // 截屏导入图片
 function screenCapture(){
 	ipcRenderer.send('x-screen-capture');
-	desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.width,height:window.screen.height}},(error,sources)=>{
-		if(error) throw error;
-		for(let i=0;i<sources.length;i++){
-			if(sources[i].name.toLowerCase()==='entire screen'){
-				// warningMention.init(sources[i].thumbnail.toDataURL());
-				ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
-				return ;
+	ipcRenderer.on('x-screen-capture-initialized',()=>{
+		desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.width,height:window.screen.height}},(error,sources)=>{
+			if(error) throw error;
+			console.log(sources)
+			for(let i=0;i<sources.length;i++){
+				if(sources[i].name.toLowerCase()==='entire screen'){
+					// warningMention.init(sources[i].thumbnail.toDataURL());
+					ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
+					return ;
+				}
 			}
-		}
+		});
 	});
 }
 

@@ -14,11 +14,35 @@
 		z-index: 1;
 		background: rgba(0,0,0,0.3);
 	}
+	.btns{
+		position: absolute;
+		display: none;
+		z-index: 2;
+		background: #fff;
+	    padding: 2px;
+	    border-radius: 2px;
+	}
+	.btns>button{
+	    border: 1px solid transparent;
+	    outline: none;
+	    padding: 3px 5px;
+	    background: #fff;
+	    font-family: 微软雅黑;
+	    border-radius: 2px;
+	}
+	.btns>button:hover{
+		text-shadow: 0 0 2px #aaa;
+   		border: 1px solid #ddd;
+	}
 	</style>
 </head>
 <body>
 	<canvas id="cap"></canvas>
 	<canvas id="c"></canvas>
+	<div class="btns" id="tools">
+		<button>取消</button>
+		<button>确定</button>
+	</div>
 	<script>
 	const {desktopCapturer,ipcRenderer}
 			=require('electron');
@@ -49,21 +73,75 @@
 		endY:0
 	};
 	cap.onmousedown=(e)=>{
-		mouse.startX=e.clientX,mouse.startY=e.clientY;
+		mouse.startX=e.clientX;
+		mouse.startY=e.clientY;
 		cap.onmousemove=(e)=>{
-			mouse.endX=e.clientX,mouse.endY=e.clientY;
-			ctxFront.clearRect(0,0,cap.width,cap.height);
-			ctxFront.lineWidth=5;
-			ctxFront.strokeRect(mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
-			ctxFront.drawImage(c,mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY,mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
-			ctxFront.strokeStyle='#8DD7FF';
-			ctxFront.stroke();
-		}
-	}
+			mouse.endX=e.clientX;
+			mouse.endY=e.clientY;
+			drawRect();
+		};
+	};
+	let x,y,deltaX,deltaY;
 	cap.onmouseup=(e)=>{
-			// mouse.endX=e.clientX,mouse.endY=e.clientY;
-		cap.onmousemove=null;
+		mouse.startX+=deltaX||0;
+		mouse.startY+=deltaY||0;
+		mouse.endX+=deltaX||0;
+		mouse.endY+=deltaY||0;
+		cap.style.cursor='auto';
+
+		tools.style.display='inline-block';
+		tools.style.top=mouse.endY+3+'px';
+		tools.style.left=mouse.endX-83+'px';
+		// mouse.endX=e.clientX,mouse.endY=e.clientY;
+		// cap.onmousemove=null;
+		cap.onmousemove=(e)=>{
+			// 拖动划出的矩形框
+			if(ctxFront.isPointInPath(e.clientX,e.clientY)){
+				cap.style.cursor='move';
+				cap.onmousedown=(e)=>{
+					// 记录点击的位置来计算鼠标移动时的位移量
+					x=e.clientX,y=e.clientY;
+					cap.onmousemove=(e)=>{
+						deltaX=e.clientX-x;
+						deltaY=e.clientY-y;
+						drawRect(mouse.startX+deltaX,
+								 mouse.startY+deltaY,
+								 mouse.endX+deltaX,
+								 mouse.endY+deltaY);
+						tools.style.top=mouse.endY+deltaY+3+'px';
+						tools.style.left=mouse.endX+deltaX-83+'px';
+					};
+				};
+			}else{
+				cap.style.cursor='auto';
+				cap.onmousedown=null;
+			}
+		};
 	}
+	let drawRect=(sx,sy,ex,ey)=>{
+		ctxFront.clearRect(0,0,cap.width,cap.height);
+		ctxFront.beginPath();
+		ctxFront.lineWidth=3;
+		// ctxFront.rect(mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
+		ctxFront.moveTo(sx || mouse.startX,sy || mouse.startY);
+		ctxFront.lineTo(ex || mouse.endX,sy || mouse.startY);
+		ctxFront.lineTo(ex || mouse.endX,ey || mouse.endY);
+		ctxFront.lineTo(sx || mouse.startX,ey || mouse.endY);
+		ctxFront.lineTo(sx || mouse.startX,sy || mouse.startY);
+
+		ctxFront.drawImage(c,
+			sx || mouse.startX,
+			sy || mouse.startY,
+			(ex || mouse.endX)-(sx || mouse.startX),
+			(ey || mouse.endY)-(sy || mouse.startY),
+			sx || mouse.startX,
+			sy || mouse.startY,
+			(ex || mouse.endX)-(sx || mouse.startX),
+			(ey || mouse.endY)-(sy || mouse.startY));
+		ctxFront.strokeStyle='#1D9BFF';
+		ctxFront.closePath();
+		ctxFront.stroke();
+	};
 	</script>
 </body>
 </html>

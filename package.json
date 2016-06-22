@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "rm xmirror.asar && asar pack .  xmirror.asar && electron ."
+    "test": "rm xmirror.asar && asar pack .  xmirror.asar && electron .",
+    "examin": "asar pack .  xmirror.asar && electron ."
   },
   "author": "xiekun1992",
   "license": "ISC",
