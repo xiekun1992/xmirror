@@ -1,9 +1,11 @@
 const electron=require('electron');
-const {app}=electron;
-const {BrowserWindow}=electron;
-const {ipcMain}=electron;
-const {dialog}=electron;
-
+const {
+	app,
+	BrowserWindow,
+	ipcMain,
+	dialog,
+	globalShortcut
+}=electron;
 
 let win;
 
@@ -25,6 +27,13 @@ function createWindow(){
 	win.on('closed',()=>{
 		win=null;
 	});
+
+	// 给屏幕截图窗口设置退出截图的快捷键
+	globalShortcut.register('Esc',()=>{
+		if(tmpWindow){
+			tmpWindow.destroy();
+		}
+	});
 }
 
 app.on('ready',createWindow);
@@ -33,6 +42,10 @@ app.on('window-all-closed',()=>{
 	if(process.platform!=='darwin'){
 		app.quit();
 	}
+});
+
+app.on('will-quit',()=>{
+	globalShortcut.unregisterAll();
 });
 
 app.on('activate',()=>{
@@ -68,21 +81,53 @@ ipcMain.on('x-open-dialog',(event)=>{
 	}
 });
 
-let tmpWindow;
+// 创建屏幕捕获窗口
+let tmpWindow,readyToDraw=false,picture,readyToDrawEvent;
+
 ipcMain.on('x-screen-capture',()=>{
-	// 用于屏幕捕获
+	// 隐藏主界面窗口
+	win.hide();
+
 	tmpWindow=new BrowserWindow({
-		// width:1366,
-		// height:1000,
 		alwaysOnTop:true,
 		fullscreen:true,
 		resizable:false,
 		movable:false,
 		closable:false,
 		frame:false,
-		transparent:true
+		transparent:true,
+		show:false
 	});
+	// tmpWindow.hide();
+	tmpWindow.loadURL(`file://${__dirname}/partials/capture.html`);
+	// tmpWindow.webContents.openDevTools();
 });
+// 接收程序主界面传来的图像截图并设置到屏幕截图显示界面
 ipcMain.on('x-screen-capture-picture',(event,data)=>{
-	tmpWindow.loadURL(`file://${__dirname}/partial/capture.html`);
+	picture=data.url;
+	if(readyToDraw && readyToDrawEvent){
+		sendPictureToDraw(readyToDrawEvent);
+	}else{
+		let timer=setInterval(function(){
+			if(readyToDraw && readyToDrawEvent){
+				sendPictureToDraw(readyToDrawEvent);
+				clearInterval(timer);
+			}
+		},10);
+	}
+});
+// 截图窗口加载完成
+ipcMain.on('x-ready-to-draw',(event)=>{
+	readyToDraw=true;
+	readyToDrawEvent=event;
+	sendPictureToDraw(event);
+});
+// 将主界面截到的图片传递到截图显示窗口
+function sendPictureToDraw(event){
+	event.sender.send('x-picture-to-draw',{path:picture});
+}
+// 完成截图的显示之后显示窗口
+ipcMain.on('x-picture-draw-end',()=>{
+	tmpWindow.show();
+	win.show();
 });

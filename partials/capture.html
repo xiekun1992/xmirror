@@ -2,35 +2,68 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>screen capture</title>
+	<style>
+	body{
+		background:transparent;margin:0;padding:0;overflow:hidden;position:relative;
+	}
+	#cap{
+		position: absolute;
+		left: 0;
+		top:0;
+		z-index: 1;
+		background: rgba(0,0,0,0.3);
+	}
+	</style>
 </head>
-<body style="background:transparent;">
+<body>
+	<canvas id="cap"></canvas>
 	<canvas id="c"></canvas>
 	<script>
-	const {desktopCapturer}=require('electron');
+	const {desktopCapturer,ipcRenderer}
+			=require('electron');
 
-	c.width=window.screen.availWidth;
-	c.height=window.screen.availHeight;
+	ipcRenderer.send('x-ready-to-draw');
+	ipcRenderer.on('x-picture-to-draw',(event,data)=>{
+		img.src=data.path;
+	});
+
+	c.width=cap.width=window.screen.width;
+	c.height=cap.height=window.screen.height;
 
 	const ctx=c.getContext('2d');
+	const ctxFront=cap.getContext('2d');
 
 	const img=new Image();
-	img.onload=function(){
+	img.onload=()=>{
 		ctx.clearRect(0,0,c.width,c.height);
 		ctx.drawImage(img,0,0);
+		ipcRenderer.send('x-picture-draw-end');
 	};
 
-	desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.availWidth,height:window.screen.availHeight}},(error,sources)=>{
-		if(error) throw error;
-		for(let i=0;i<sources.length;i++){
-			if(sources[i].name.toLowerCase()==='entire screen'){
-				img.src=sources[i].thumbnail.toDataURL();
-				// warningMention.init(sources[i].thumbnail.toDataURL());
-				// ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
-				return ;
-			}
+	// 记录鼠标划出的矩形的起始和结束端点
+	let mouse={
+		startX:0,
+		startY:0,
+		endX:0,
+		endY:0
+	};
+	cap.onmousedown=(e)=>{
+		mouse.startX=e.clientX,mouse.startY=e.clientY;
+		cap.onmousemove=(e)=>{
+			mouse.endX=e.clientX,mouse.endY=e.clientY;
+			ctxFront.clearRect(0,0,cap.width,cap.height);
+			ctxFront.lineWidth=5;
+			ctxFront.strokeRect(mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
+			ctxFront.drawImage(c,mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY,mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
+			ctxFront.strokeStyle='#8DD7FF';
+			ctxFront.stroke();
 		}
-	});
+	}
+	cap.onmouseup=(e)=>{
+			// mouse.endX=e.clientX,mouse.endY=e.clientY;
+		cap.onmousemove=null;
+	}
 	</script>
 </body>
 </html>
