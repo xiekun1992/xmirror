@@ -40,7 +40,7 @@
 	<canvas id="cap"></canvas>
 	<canvas id="c"></canvas>
 	<div class="btns" id="tools">
-		<button>取消</button>
+		<button onclick="cancelRect()">取消</button>
 		<button>确定</button>
 	</div>
 	<script>
@@ -70,7 +70,9 @@
 		startX:0,
 		startY:0,
 		endX:0,
-		endY:0
+		endY:0,
+		height:0,
+		width:0
 	};
 	cap.onmousedown=(e)=>{
 		mouse.startX=e.clientX;
@@ -78,17 +80,29 @@
 		cap.onmousemove=(e)=>{
 			mouse.endX=e.clientX;
 			mouse.endY=e.clientY;
-			drawRect();
+			drawRect(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
 		};
 	};
-	let x,y,deltaX,deltaY;
+	let x,y,deltaX,deltaY,
+		screenHeight=window.screen.height,
+		screenWidth=window.screen.width,
+		boundrysX,
+		boundrysY,
+		boundryeX,
+		boundryeY,
+		toolsBaseX,
+		toolsBaseY;
 	cap.onmouseup=(e)=>{
-		mouse.startX+=deltaX||0;
-		mouse.startY+=deltaY||0;
-		mouse.endX+=deltaX||0;
-		mouse.endY+=deltaY||0;
+		mouse.startX=boundrysX||mouse.startX;
+		mouse.startY=boundrysY||mouse.startY;
+		mouse.endX=boundryeX||mouse.endX;
+		mouse.endY=boundryeY||mouse.endY;
+		// 鼠标松开后计算所划矩形高度和宽度
+		mouse.height=Math.abs(mouse.endY-mouse.startY);
+		mouse.width=Math.abs(mouse.endX-mouse.startX);
 		cap.style.cursor='auto';
 
+		// 根据起始点的四个象限确定右下角的基点
 		tools.style.display='inline-block';
 		tools.style.top=mouse.endY+3+'px';
 		tools.style.left=mouse.endX-83+'px';
@@ -104,12 +118,48 @@
 					cap.onmousemove=(e)=>{
 						deltaX=e.clientX-x;
 						deltaY=e.clientY-y;
-						drawRect(mouse.startX+deltaX,
-								 mouse.startY+deltaY,
-								 mouse.endX+deltaX,
-								 mouse.endY+deltaY);
-						tools.style.top=mouse.endY+deltaY+3+'px';
-						tools.style.left=mouse.endX+deltaX-83+'px';
+						
+						// 检测是否超出屏幕可见区域
+							boundrysX=mouse.startX+deltaX,
+							boundrysY=mouse.startY+deltaY,
+							boundryeX=mouse.endX+deltaX,
+							boundryeY=mouse.endY+deltaY;
+
+						if(boundrysX<0){//竖边碰到边界，就固定对立的一边
+							boundrysX=0;
+							boundryeX=boundrysX+mouse.width;
+						}else if(boundrysX>screenWidth){
+							boundrysX=screenWidth;
+							boundryeX=boundrysX-mouse.width;
+						} 
+						if(boundryeX<0){
+							boundryeX=0;
+							boundrysX=boundryeX+mouse.width;	
+						}else if(boundryeX>screenWidth){
+							boundryeX=screenWidth;
+							boundrysX=boundryeX-mouse.width;
+						}
+						if(boundrysY<0){//横边碰到边界，就固定对立的一边
+							boundrysY=0;
+							boundryeY=boundrysY+mouse.height;
+						}else if(boundrysY>screenHeight){
+							boundrysY=screenHeight;
+							boundryeY=boundrysY-mouse.height;
+						}
+						if(boundryeY<0){
+							boundryeY=0;
+							boundrysY=boundryeY+mouse.height;	
+						}else if(boundryeY>screenHeight){
+							boundryeY=screenHeight;
+							boundrysY=boundryeY-mouse.height;
+						}
+
+						// console.log(boundrysX,boundrysY,boundryeX,boundryeY);
+						drawRect(boundrysX,boundrysY,boundryeX,boundryeY);
+
+						// 对接触底边后的情况的处理
+						// tools.style.top=boundryeY+3+'px';
+						// tools.style.left=mouse.endX+boundryX-83+'px';
 					};
 				};
 			}else{
@@ -121,27 +171,22 @@
 	let drawRect=(sx,sy,ex,ey)=>{
 		ctxFront.clearRect(0,0,cap.width,cap.height);
 		ctxFront.beginPath();
-		ctxFront.lineWidth=3;
+		ctxFront.lineWidth=1;
 		// ctxFront.rect(mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
-		ctxFront.moveTo(sx || mouse.startX,sy || mouse.startY);
-		ctxFront.lineTo(ex || mouse.endX,sy || mouse.startY);
-		ctxFront.lineTo(ex || mouse.endX,ey || mouse.endY);
-		ctxFront.lineTo(sx || mouse.startX,ey || mouse.endY);
-		ctxFront.lineTo(sx || mouse.startX,sy || mouse.startY);
+		ctxFront.moveTo(sx,sy);
+		ctxFront.lineTo(ex,sy);
+		ctxFront.lineTo(ex,ey);
+		ctxFront.lineTo(sx,ey);
+		ctxFront.lineTo(sx,sy);
 
-		ctxFront.drawImage(c,
-			sx || mouse.startX,
-			sy || mouse.startY,
-			(ex || mouse.endX)-(sx || mouse.startX),
-			(ey || mouse.endY)-(sy || mouse.startY),
-			sx || mouse.startX,
-			sy || mouse.startY,
-			(ex || mouse.endX)-(sx || mouse.startX),
-			(ey || mouse.endY)-(sy || mouse.startY));
+		ctxFront.drawImage(c,sx,sy,ex-sx,ey-sy,sx,sy,ex-sx,ey-sy);
 		ctxFront.strokeStyle='#1D9BFF';
 		ctxFront.closePath();
 		ctxFront.stroke();
 	};
+	function cancelRect(){
+		ctxFront.clearRect(0,0,cap.width,cap.height);
+	}
 	</script>
 </body>
 </html>
