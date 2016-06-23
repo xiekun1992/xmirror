@@ -49,6 +49,9 @@ function screenCapture(){
 				if(sources[i].name.toLowerCase()==='entire screen'){
 					// warningMention.init(sources[i].thumbnail.toDataURL());
 					ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
+					ipcRenderer.once('x-screen-capture-picture-clipped',(event,data)=>{
+						warningMention.init(data.pic);
+					});
 					return ;
 				}
 			}

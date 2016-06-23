@@ -29,13 +29,15 @@ function createWindow(){
 	});
 
 	// 给屏幕截图窗口设置退出截图的快捷键
-	globalShortcut.register('Esc',()=>{
-		if(tmpWindow){
-			readyToDraw=false;
-			tmpWindow.destroy();
-			win.isMinimized() && win.restore();
-		}
-	});
+	globalShortcut.register('Esc',tmpWindowEsc);
+}
+function tmpWindowEsc(){
+	if(tmpWindow){
+		readyToDraw=false;
+		tmpWindow.destroy();
+		win.isMinimized() && win.restore();
+		xScreenCaptureFinish && ipcMain.removeListener('x-screen-capture-finish',xScreenCaptureFinish);
+	}
 }
 
 app.on('ready',createWindow);
@@ -112,6 +114,7 @@ ipcMain.on('x-screen-capture',(event)=>{
 	win.minimize();
 });
 // 接收程序主界面传来的图像截图并设置到屏幕截图显示界面
+let xScreenCaptureFinish;
 ipcMain.on('x-screen-capture-picture',(event,data)=>{
 	picture=data.url;
 	let timer=setInterval(function(){
@@ -122,17 +125,17 @@ ipcMain.on('x-screen-capture-picture',(event,data)=>{
 			}
 		}
 	},10);
+	let eventCallback=event;
+	xScreenCaptureFinish=(event,data)=>{
+		eventCallback.sender.send('x-screen-capture-picture-clipped',data);
+		tmpWindowEsc();
+	};
+	ipcMain.once('x-screen-capture-finish',xScreenCaptureFinish);
 });
 // 截图窗口加载完成
 ipcMain.on('x-ready-to-draw',(event)=>{
 	readyToDraw=true;
 	readyToDrawEvent=event;
-	// let timer=setInterval(function(){
-	// 	if(win.isMinimized()){
-	// 		sendPictureToDraw(event);
-	// 		clearInterval(timer);
-	// 	}
-	// },10);
 });
 // 将主界面截到的图片传递到截图显示窗口
 function sendPictureToDraw(event){

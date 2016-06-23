@@ -35,21 +35,25 @@
 		text-shadow: 0 0 2px #aaa;
    		border: 1px solid #bbb;
 	}
+	#result{
+		display: none;
+	}
 	</style>
 </head>
 <body>
 	<canvas id="cap"></canvas>
 	<canvas id="c"></canvas>
+	<canvas id="result"></canvas>
 	<div class="btns" id="tools">
 		<button onclick="cancelRect()">取消</button>
-		<button>确定</button>
+		<button onclick="clipRect()">确定</button>
 	</div>
 	<script>
 	const {desktopCapturer,ipcRenderer}
 			=require('electron');
 
 	ipcRenderer.send('x-ready-to-draw');
-	ipcRenderer.on('x-picture-to-draw',(event,data)=>{
+	ipcRenderer.once('x-picture-to-draw',(event,data)=>{
 		img.src=data.path;
 	});
 
@@ -232,9 +236,9 @@
 		ctxFront.stroke();
 	};
 	readyToDraw();
-	function cancelRect(){
+	let cancelRect=()=>{
 		ctxFront.clearRect(0,0,cap.width,cap.height);
-		cap.style.cursor='context-menu';
+		cap.style.cursor='crosshair';
 		tools.style.display='none';
 		mouse={
 			startX:0,
@@ -246,7 +250,15 @@
 		};
 		cap.onmousedown=cap.onmousemove=cap.onmouseup=null;
 		readyToDraw();
-	}
+	};
+	let clipRect=()=>{
+		const imgData=ctx.getImageData(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
+		const ctxResult=result.getContext('2d');
+		result.width=mouse.width;
+		result.height=mouse.height;
+		ctxResult.putImageData(imgData,0,0);
+		ipcRenderer.send('x-screen-capture-finish',{pic:result.toDataURL()});
+	};
 	</script>
 </body>
 </html>
