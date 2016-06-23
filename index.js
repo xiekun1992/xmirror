@@ -102,6 +102,7 @@ ipcMain.on('x-screen-capture',(event)=>{
 	tmpWindow.loadURL(`file://${__dirname}/partials/capture.html`);
 	// tmpWindow.webContents.openDevTools();
 	win.on('minimize',()=>{
+		// 此处是否设置的延迟和系统是否开启窗口动画显隐效果有关
 		let timer=setTimeout(function(){
 			event.sender.send('x-screen-capture-initialized');
 			clearTimeout(timer);
@@ -113,22 +114,25 @@ ipcMain.on('x-screen-capture',(event)=>{
 // 接收程序主界面传来的图像截图并设置到屏幕截图显示界面
 ipcMain.on('x-screen-capture-picture',(event,data)=>{
 	picture=data.url;
-	if(readyToDraw && readyToDrawEvent){
-		sendPictureToDraw(readyToDrawEvent);
-	}else{
-		let timer=setInterval(function(){
-			if(readyToDraw && readyToDrawEvent){
+	let timer=setInterval(function(){
+		if(readyToDraw && readyToDrawEvent){
+			if(win.isMinimized()){
 				sendPictureToDraw(readyToDrawEvent);
 				clearInterval(timer);
 			}
-		},10);
-	}
+		}
+	},10);
 });
 // 截图窗口加载完成
 ipcMain.on('x-ready-to-draw',(event)=>{
 	readyToDraw=true;
 	readyToDrawEvent=event;
-	sendPictureToDraw(event);
+	// let timer=setInterval(function(){
+	// 	if(win.isMinimized()){
+	// 		sendPictureToDraw(event);
+	// 		clearInterval(timer);
+	// 	}
+	// },10);
 });
 // 将主界面截到的图片传递到截图显示窗口
 function sendPictureToDraw(event){
