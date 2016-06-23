@@ -103,6 +103,15 @@
 		cap.style.cursor='auto';
 
 		// 根据起始点的四个象限确定右下角的基点
+		if(mouse.startX<=mouse.endX && mouse.startY<=mouse.endY){//第一象限
+
+		}else if(mouse.startX>mouse.endX && mouse.startY<=mouse.endY){//第二象限
+
+		}else if(mouse.startX>mouse.endX && mouse.startY>mouse.endY){//第三象限
+
+		}else{//第四象限
+			
+		}
 		tools.style.display='inline-block';
 		tools.style.top=mouse.endY+3+'px';
 		tools.style.left=mouse.endX-83+'px';
