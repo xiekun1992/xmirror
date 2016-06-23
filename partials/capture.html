@@ -13,6 +13,7 @@
 		top:0;
 		z-index: 1;
 		background: rgba(0,0,0,0.3);
+		cursor: crosshair;
 	}
 	.btns{
 		position: absolute;
@@ -32,7 +33,7 @@
 	}
 	.btns>button:hover{
 		text-shadow: 0 0 2px #aaa;
-   		border: 1px solid #ddd;
+   		border: 1px solid #bbb;
 	}
 	</style>
 </head>
@@ -74,113 +75,150 @@
 		height:0,
 		width:0
 	};
-	cap.onmousedown=(e)=>{
-		mouse.startX=e.clientX;
-		mouse.startY=e.clientY;
-		cap.onmousemove=(e)=>{
-			mouse.endX=e.clientX;
-			mouse.endY=e.clientY;
-			drawRect(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
+	let readyToDraw=()=>{
+		cap.onmousedown=(e)=>{
+			mouse.startX=e.clientX;
+			mouse.startY=e.clientY;
+			cap.onmousemove=(e)=>{
+				mouse.endX=e.clientX;
+				mouse.endY=e.clientY;
+				drawRect(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
+				boundrysX=mouse.startX,
+				boundrysY=mouse.startY,
+				boundryeX=mouse.endX,
+				boundryeY=mouse.endY;
+			};
 		};
-	};
-	let x,y,deltaX,deltaY,
-		screenHeight=window.screen.height,
-		screenWidth=window.screen.width,
-		boundrysX,
-		boundrysY,
-		boundryeX,
-		boundryeY,
-		toolsBaseX,
-		toolsBaseY;
-	cap.onmouseup=(e)=>{
-		mouse.startX=boundrysX||mouse.startX;
-		mouse.startY=boundrysY||mouse.startY;
-		mouse.endX=boundryeX||mouse.endX;
-		mouse.endY=boundryeY||mouse.endY;
-		// 鼠标松开后计算所划矩形高度和宽度
-		mouse.height=Math.abs(mouse.endY-mouse.startY);
-		mouse.width=Math.abs(mouse.endX-mouse.startX);
-		cap.style.cursor='auto';
+		let x,y,deltaX,deltaY,
+			screenHeight=window.screen.height,
+			screenWidth=window.screen.width,
+			boundrysX,
+			boundrysY,
+			boundryeX,
+			boundryeY,
+			toolsBaseX,
+			toolsBaseY;
+		cap.onmouseup=(e)=>{
+			mouse.startX=boundrysX;
+			mouse.startY=boundrysY;
+			mouse.endX=boundryeX;
+			mouse.endY=boundryeY;
+			// 鼠标松开后计算所划矩形高度和宽度
+			mouse.height=Math.abs(mouse.endY-mouse.startY);
+			mouse.width=Math.abs(mouse.endX-mouse.startX);
+			console.log(mouse);
+			cap.style.cursor='auto';
 
-		// 根据起始点的四个象限确定右下角的基点
-		if(mouse.startX<=mouse.endX && mouse.startY<=mouse.endY){//第一象限
-
-		}else if(mouse.startX>mouse.endX && mouse.startY<=mouse.endY){//第二象限
-
-		}else if(mouse.startX>mouse.endX && mouse.startY>mouse.endY){//第三象限
-
-		}else{//第四象限
-			
-		}
-		tools.style.display='inline-block';
-		tools.style.top=mouse.endY+3+'px';
-		tools.style.left=mouse.endX-83+'px';
-		// mouse.endX=e.clientX,mouse.endY=e.clientY;
-		// cap.onmousemove=null;
-		cap.onmousemove=(e)=>{
-			// 拖动划出的矩形框
-			if(ctxFront.isPointInPath(e.clientX,e.clientY)){
-				cap.style.cursor='move';
-				cap.onmousedown=(e)=>{
-					// 记录点击的位置来计算鼠标移动时的位移量
-					x=e.clientX,y=e.clientY;
-					cap.onmousemove=(e)=>{
-						deltaX=e.clientX-x;
-						deltaY=e.clientY-y;
-						
-						// 检测是否超出屏幕可见区域
+			// 根据起始点的四个象限确定右下角的基点，坐标原点在左上角，象限顺序逆时针为四三二一
+			if(mouse.startX<=mouse.endX && mouse.startY<=mouse.endY){//第一象限
+				toolsBaseX=mouse.endX;
+				if(screenHeight-mouse.endY<=30){// 距离下边界太近
+					toolsBaseY=mouse.startY-34;
+					if(mouse.startY<=30){
+						toolsBaseY=mouse.endY-34;
+					}
+				}else{
+					toolsBaseY=mouse.endY;
+				}
+			}else if(mouse.startX>mouse.endX && mouse.startY<mouse.endY){//第二象限
+				toolsBaseX=mouse.startX;
+				if(screenHeight-mouse.endY<=30){// 距离下边界太近
+					toolsBaseY=mouse.startY-34;
+					if(mouse.startY<=30){
+						toolsBaseY=mouse.endY-34;
+					}
+				}else{
+					toolsBaseY=mouse.endY;
+				}
+			}else if(mouse.startX>mouse.endX && mouse.startY>mouse.endY){//第三象限
+				toolsBaseX=mouse.startX;
+				if(screenHeight-mouse.startY<=30){// 距离下边界太近
+					toolsBaseY=mouse.endY-34;
+					if(mouse.endY<=30){
+						toolsBaseY=mouse.startY-34;
+					}
+				}else{
+					toolsBaseY=mouse.startY;
+				}
+			}else{//第四象限
+				toolsBaseX=mouse.endX;
+				if(screenHeight-mouse.startY<=30){// 距离下边界太近
+					toolsBaseY=mouse.endY-34;
+					if(mouse.endY<=30){
+						toolsBaseY=mouse.startY-34;
+					}
+				}else{
+					toolsBaseY=mouse.startY;
+				}
+			}
+			tools.style.display='inline-block';
+			tools.style.top=toolsBaseY+3+'px';
+			tools.style.left=toolsBaseX-86+'px';
+			// mouse.endX=e.clientX,mouse.endY=e.clientY;
+			// cap.onmousemove=null;
+			cap.onmousemove=(e)=>{
+				// 拖动划出的矩形框
+				if(ctxFront.isPointInPath(e.clientX,e.clientY)){
+					cap.style.cursor='move';
+					cap.onmousedown=(e)=>{
+						// 记录点击的位置来计算鼠标移动时的位移量
+						x=e.clientX,y=e.clientY;
+						cap.onmousemove=(e)=>{
+							tools.style.display='none';
+							deltaX=e.clientX-x;
+							deltaY=e.clientY-y;
+							
+							// 检测是否超出屏幕可见区域
 							boundrysX=mouse.startX+deltaX,
 							boundrysY=mouse.startY+deltaY,
 							boundryeX=mouse.endX+deltaX,
 							boundryeY=mouse.endY+deltaY;
 
-						if(boundrysX<0){//竖边碰到边界，就固定对立的一边
-							boundrysX=0;
-							boundryeX=boundrysX+mouse.width;
-						}else if(boundrysX>screenWidth){
-							boundrysX=screenWidth;
-							boundryeX=boundrysX-mouse.width;
-						} 
-						if(boundryeX<0){
-							boundryeX=0;
-							boundrysX=boundryeX+mouse.width;	
-						}else if(boundryeX>screenWidth){
-							boundryeX=screenWidth;
-							boundrysX=boundryeX-mouse.width;
-						}
-						if(boundrysY<0){//横边碰到边界，就固定对立的一边
-							boundrysY=0;
-							boundryeY=boundrysY+mouse.height;
-						}else if(boundrysY>screenHeight){
-							boundrysY=screenHeight;
-							boundryeY=boundrysY-mouse.height;
-						}
-						if(boundryeY<0){
-							boundryeY=0;
-							boundrysY=boundryeY+mouse.height;	
-						}else if(boundryeY>screenHeight){
-							boundryeY=screenHeight;
-							boundrysY=boundryeY-mouse.height;
-						}
+							if(boundrysX<0){//竖边碰到边界，就固定对立的一边
+								boundrysX=0;
+								boundryeX=boundrysX+mouse.width;
+							}else if(boundrysX>screenWidth){
+								boundrysX=screenWidth;
+								boundryeX=boundrysX-mouse.width;
+							} 
+							if(boundryeX<0){
+								boundryeX=0;
+								boundrysX=boundryeX+mouse.width;	
+							}else if(boundryeX>screenWidth){
+								boundryeX=screenWidth;
+								boundrysX=boundryeX-mouse.width;
+							}
+							if(boundrysY<0){//横边碰到边界，就固定对立的一边
+								boundrysY=0;
+								boundryeY=boundrysY+mouse.height;
+							}else if(boundrysY>screenHeight){
+								boundrysY=screenHeight;
+								boundryeY=boundrysY-mouse.height;
+							}
+							if(boundryeY<0){
+								boundryeY=0;
+								boundrysY=boundryeY+mouse.height;	
+							}else if(boundryeY>screenHeight){
+								boundryeY=screenHeight;
+								boundrysY=boundryeY-mouse.height;
+							}
 
-						// console.log(boundrysX,boundrysY,boundryeX,boundryeY);
-						drawRect(boundrysX,boundrysY,boundryeX,boundryeY);
-
-						// 对接触底边后的情况的处理
-						// tools.style.top=boundryeY+3+'px';
-						// tools.style.left=mouse.endX+boundryX-83+'px';
+							// console.log(boundrysX,boundrysY,boundryeX,boundryeY);
+							drawRect(boundrysX,boundrysY,boundryeX,boundryeY);
+						};
 					};
-				};
-			}else{
-				cap.style.cursor='auto';
-				cap.onmousedown=null;
-			}
-		};
+				}else{
+					cap.style.cursor='auto';
+					cap.onmousedown=null;
+				}
+			};
+		}
 	}
+	
 	let drawRect=(sx,sy,ex,ey)=>{
 		ctxFront.clearRect(0,0,cap.width,cap.height);
 		ctxFront.beginPath();
-		ctxFront.lineWidth=1;
+		// ctxFront.lineWidth=1;
 		// ctxFront.rect(mouse.startX,mouse.startY,mouse.endX-mouse.startX,mouse.endY-mouse.startY);
 		ctxFront.moveTo(sx,sy);
 		ctxFront.lineTo(ex,sy);
@@ -193,8 +231,21 @@
 		ctxFront.closePath();
 		ctxFront.stroke();
 	};
+	readyToDraw();
 	function cancelRect(){
 		ctxFront.clearRect(0,0,cap.width,cap.height);
+		cap.style.cursor='context-menu';
+		tools.style.display='none';
+		mouse={
+			startX:0,
+			startY:0,
+			endX:0,
+			endY:0,
+			height:0,
+			width:0
+		};
+		cap.onmousedown=cap.onmousemove=cap.onmouseup=null;
+		readyToDraw();
 	}
 	</script>
 </body>
