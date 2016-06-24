@@ -32,11 +32,11 @@ function createWindow(){
 	globalShortcut.register('Esc',tmpWindowEsc);
 }
 function tmpWindowEsc(){
+	xScreenCaptureFinish && ipcMain.removeListener('x-screen-capture-finish',xScreenCaptureFinish);
 	if(tmpWindow){
 		readyToDraw=false;
 		tmpWindow.destroy();
 		win.isMinimized() && win.restore();
-		xScreenCaptureFinish && ipcMain.removeListener('x-screen-capture-finish',xScreenCaptureFinish);
 	}
 }
 
@@ -116,6 +116,7 @@ ipcMain.on('x-screen-capture',(event)=>{
 // 接收程序主界面传来的图像截图并设置到屏幕截图显示界面
 let xScreenCaptureFinish;
 ipcMain.on('x-screen-capture-picture',(event,data)=>{
+	event.preventDefault();
 	picture=data.url;
 	let timer=setInterval(function(){
 		if(readyToDraw && readyToDrawEvent){
@@ -130,7 +131,8 @@ ipcMain.on('x-screen-capture-picture',(event,data)=>{
 		eventCallback.sender.send('x-screen-capture-picture-clipped',data);
 		tmpWindowEsc();
 	};
-	ipcMain.once('x-screen-capture-finish',xScreenCaptureFinish);
+	ipcMain.on('x-screen-capture-finish',xScreenCaptureFinish);
+	return false;
 });
 // 截图窗口加载完成
 ipcMain.on('x-ready-to-draw',(event)=>{

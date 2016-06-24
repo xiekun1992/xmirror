@@ -252,7 +252,31 @@
 		readyToDraw();
 	};
 	let clipRect=()=>{
-		const imgData=ctx.getImageData(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
+		console.log(mouse.startX,mouse.startY,mouse.endX,mouse.endY);
+		let x1,y1,x2,y2;
+		// 根据起始点的四个象限确定右下角的基点，坐标原点在左上角，象限顺序逆时针为四三二一
+		if(mouse.startX<=mouse.endX && mouse.startY<=mouse.endY){//第一象限
+			x1=mouse.startX;
+			y1=mouse.startY;
+			x2=mouse.endX;
+			y2=mouse.endY;
+		}else if(mouse.startX>mouse.endX && mouse.startY<mouse.endY){//第二象限
+			x1=mouse.endX;
+			y1=mouse.startY;
+			x2=mouse.startX;
+			y2=mouse.endY;
+		}else if(mouse.startX>mouse.endX && mouse.startY>mouse.endY){//第三象限
+			x1=mouse.endX;
+			y1=mouse.endY;
+			x2=mouse.startX;
+			y2=mouse.startY;
+		}else{//第四象限
+			x1=mouse.startX;
+			y1=mouse.endY;
+			x2=mouse.endX;
+			y2=mouse.startY;
+		}
+		const imgData=ctx.getImageData(x1,y1,x2,y2);
 		const ctxResult=result.getContext('2d');
 		result.width=mouse.width;
 		result.height=mouse.height;
