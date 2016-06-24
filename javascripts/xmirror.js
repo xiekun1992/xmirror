@@ -39,9 +39,11 @@ holder.ondrop=(e)=>{
 };
 
 // 截屏导入图片
-function screenCapture(){
+function screenCapture(e){
+	e.preventDefault();
+	e.stopPropagation();
 	ipcRenderer.send('x-screen-capture');
-	ipcRenderer.on('x-screen-capture-initialized',()=>{
+	ipcRenderer.once('x-screen-capture-initialized',()=>{
 		desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:window.screen.width,height:window.screen.height}},(error,sources)=>{
 			if(error) throw error;
 			console.log(sources)
@@ -49,10 +51,11 @@ function screenCapture(){
 				if(sources[i].name.toLowerCase()==='entire screen'){
 					// warningMention.init(sources[i].thumbnail.toDataURL());
 					ipcRenderer.send('x-screen-capture-picture',{url:sources[i].thumbnail.toDataURL()});
+					console.log(0)
 					ipcRenderer.once('x-screen-capture-picture-clipped',(event,data)=>{
 						warningMention.init(data.pic);
 					});
-					return ;
+					return false;
 				}
 			}
 		});
