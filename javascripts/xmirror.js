@@ -61,6 +61,29 @@ function screenCapture(e){
 		});
 	});
 }
+function saveImage(){
+	ipcRenderer.send('x-save-dialog');
+	ipcRenderer.once('x-save-dialog-ready',(event,data)=>{
+		ipcRenderer.send('x-save-dialog-picture',{pic:xmirror.exportImage(data)});
+		ipcRenderer.removeAllListeners('x-save-dialog-close');
+	});
+	ipcRenderer.once('x-save-dialog-close',()=>{
+		ipcRenderer.removeAllListeners('x-save-dialog-ready');
+	});
+}
+const workPanel=document.querySelector('#workPanel'),
+	  settingPanel=document.querySelector('#settingPanel');
+function openSettingPanel(){
+	if(workPanel.style.display==='block'){
+		workPanel.style.display='none';
+		settingPanel.style.display='block';
+		// settingPanel.setAttribute('src','./partial/setting_panel.html');
+	}else{
+		workPanel.style.display='block';
+		settingPanel.style.display='none';
+	}
+	// window.open('http://www.bing.cn');
+}
 
 const warningMention={
 	firstInit:false,
@@ -101,9 +124,9 @@ var xmirror;
 // xmirror.move();
 
 function Xmirror(imgPath){
-	var _self=this;
+	const _self=this;
 	// 画布容器
-	var layer=document.getElementById('layer'),
+	const layer=document.getElementById('layer'),
 		layerTop=layer.offsetTop,
 		layerLeft=layer.offsetLeft;
 
@@ -113,15 +136,18 @@ function Xmirror(imgPath){
 	});
 	// 获取展示用的画布和操作用的画布
 	// 采用双图层避免操作的时候清空原画布的内容
-	var c=document.getElementById('canvas');
-	var fc=document.getElementById('frontCanvas');
+	// 采用result图层导出原比例尺的图片
+	const c=document.getElementById('canvas');
+	const fc=document.getElementById('frontCanvas');
+	const rc=document.getElementById('result');
 	c.style.display='block';
 	fc.height=c.height=window.screen.availHeight;
 	fc.width=c.width=window.screen.availWidth;
-	var ctx=c.getContext('2d');
-	var fctx=fc.getContext('2d');
+	const rctx=rc.getContext('2d');
+	const ctx=c.getContext('2d');
+	const fctx=fc.getContext('2d');
 	// 移动和缩放图片的变量
-	var scale=1,scaleDelta=0.9,imgDeltaX=10,imgDeltaY=10;
+	let scale=1,scaleDelta=0.9,imgDeltaX=10,imgDeltaY=10;
 
 	this.setActiveClass=function(domtThis){
 		if(domtThis){
@@ -133,7 +159,7 @@ function Xmirror(imgPath){
 			});
 			domtThis.classList.add('active');
 		}
-	}
+	};
 	// 初始化图片
 	this.drawImage=function(){
 		ctx.clearRect(0,0,c.width,c.height);
@@ -142,6 +168,15 @@ function Xmirror(imgPath){
 			for(var i=0;i<annotations.length;i++){
 				annotations[i].draw(imgDeltaX,imgDeltaY,scale);
 			}
+		}
+	};
+	this.exportImage=function(specification){
+		console.log(specification)
+		rctx.drawImage(img,0,0);
+		if(specification.format==='image/jpg'){
+			return rc.toDataURL(specification.format,1);
+		}else{
+			return rc.toDataURL();
 		}
 	};
 	var img=new Image();

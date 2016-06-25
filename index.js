@@ -7,6 +7,8 @@ const {
 	globalShortcut
 }=electron;
 
+const fs=require('fs');
+
 let win;
 
 function createWindow(){
@@ -85,6 +87,34 @@ ipcMain.on('x-open-dialog',(event)=>{
 	}
 });
 
+ipcMain.on('x-save-dialog',(event)=>{
+	let imgPath=dialog.showSaveDialog({
+		title:'保存图片',
+		filters:[
+			{name:'*.jpg',extensions:['jpg']},
+			{name:'*.png',extensions:['png']},
+			// {name:'*.gif',extensions:['gif']},
+			// {name:'*.bmp',extensions:['bmp']},
+			{name:'*.xmir',extensions:['xmir']}
+		]
+	});
+	if(imgPath){
+		event.sender.send('x-save-dialog-ready',{format:'image/'+imgPath.split('.').pop()});
+		ipcMain.once('x-save-dialog-picture',(event,data)=>{
+			// console.log(data.pic)
+			// 去出base64编码中的格式说明
+			base64Pic=data.pic.replace(/^data:\S+;base64,/,'');
+			fs.writeFile(imgPath,base64Pic,'base64',(err)=>{
+				if(err){
+					// 
+					console.log(err)
+				}
+			});
+		});
+	}else{
+		event.sender.send('x-save-dialog-close');
+	}
+});
 // 创建屏幕捕获窗口
 var tmpWindow,readyToDraw=false,picture,readyToDrawEvent;
 

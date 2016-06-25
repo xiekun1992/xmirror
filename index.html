@@ -9,45 +9,52 @@
 <body>
 	<div class="topbar">
 		<div class="btns">
-			<span class="close btn" onclick="closeWin()" title="关闭"></span>
-			<span class="min btn" onclick="minWin()" title="最小化"></span>
-			<span class="max btn" onclick="maxWin()" title="最大化"></span>
+			<span class="close btn" onclick="closeWin()" >&times;</span>
+			<span class="min btn" onclick="minWin()" >-</span>
+			<span class="max btn" onclick="maxWin()" >+</span>
+		</div>
+		<div class="menu">
+			<button class="item" onclick="openSettingPanel()"><i class="fa fa-user" aria-hidden="true"></i> 谢昆</button>
 		</div>
 	</div>
 	<!-- <img src="" id="img"> -->
 	<!-- <video id="video" style="display:none;"></video> -->
 	<!-- <canvas id="videoPic" style="display:none;"></canvas> -->
-	<div style="position:relative;overflow:hidden;" id="layer">
-		<canvas id="frontCanvas"></canvas>
-		<canvas id="canvas"></canvas>
+	<div id="workPanel">
+		<div style="position:relative;overflow:hidden;" id="layer">
+			<canvas id="frontCanvas"></canvas>
+			<canvas id="canvas"></canvas>
+			<canvas id="result"></canvas>
+		</div>
+		<div class="dock" id="tooltip">
+			<!-- 打开 -->
+			<button class="tool l" title="打开" onclick="openDialog()"><i class="fa fa-folder-open-o" aria-hidden="true"></i></button>
+			<!-- 截屏 -->
+			<button class="tool l" title="截屏" onclick="screenCapture(event)"><i class="fa fa-crop" aria-hidden="true"></i></button>
+			<!-- 保存 -->
+			<button disabled="disabled" class="tool l" title="保存" onclick="saveImage()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
+			<!-- 撤销 -->
+			<button disabled="disabled" class="tool l" title="撤销"><i class="fa fa-undo" aria-hidden="true"></i></button>
+			<!-- 重做 -->
+			<button disabled="disabled" class="tool l" title="重做"><i class="fa fa-repeat" aria-hidden="true"></i></button>
+			<!-- 尺标 -->
+			<button disabled="disabled" class="tool" title="尺标"><i class="fa fa-arrows-h" aria-hidden="true"></i></button>
+			<!-- 坐标 -->
+			<button disabled="disabled" class="tool" title="坐标"><i class="fa fa-arrows" aria-hidden="true"></i></button>
+			<!-- 拾色器 -->
+			<button disabled="disabled" id="colorPicker" class="tool" onclick="xmirror.colorPicker(this)" title="拾色器"><i class="fa fa-eyedropper" aria-hidden="true"></i></button>
+			<!-- 标注 -->
+			<button disabled="disabled"  class="tool" title="标注"><i class="fa fa-font" aria-hidden="true"></i></button>
+			<!-- 移动 -->
+			<button disabled="disabled" id="move" class="tool" onclick="xmirror.move(this)" title="移动"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></button>
+			<!-- 缩小 -->
+			<button disabled="disabled"  class="tool r" title="缩小"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
+			<!-- 放大 -->
+			<button disabled="disabled"  class="tool r" title="放大"><i class="fa fa-search-plus" aria-hidden="true"></i></button>
+			
+		</div>
 	</div>
-	<div class="dock" id="tooltip">
-		<!-- 打开 -->
-		<button class="tool l" title="打开" onclick="openDialog()"><i class="fa fa-folder-open-o" aria-hidden="true"></i></button>
-		<!-- 截屏 -->
-		<button class="tool l" title="截屏" onclick="screenCapture(event)"><i class="fa fa-crop" aria-hidden="true"></i></button>
-		<!-- 保存 -->
-		<button disabled="disabled" class="tool l" title="保存" onclick="openDialog()"><i class="fa fa-floppy-o" aria-hidden="true"></i></button>
-		<!-- 撤销 -->
-		<button disabled="disabled" class="tool l" title="撤销"><i class="fa fa-undo" aria-hidden="true"></i></i></button>
-		<!-- 重做 -->
-		<button disabled="disabled" class="tool l" title="重做"><i class="fa fa-repeat" aria-hidden="true"></i></button>
-		<!-- 尺标 -->
-		<button disabled="disabled" class="tool" title="尺标"><i class="fa fa-arrows-h" aria-hidden="true"></i></button>
-		<!-- 坐标 -->
-		<button disabled="disabled" class="tool" title="坐标"><i class="fa fa-arrows" aria-hidden="true"></i></button>
-		<!-- 拾色器 -->
-		<button disabled="disabled" id="colorPicker" class="tool" onclick="xmirror.colorPicker(this)" title="拾色器"><i class="fa fa-eyedropper" aria-hidden="true"></i></button>
-		<!-- 标注 -->
-		<button disabled="disabled"  class="tool" title="标注"><i class="fa fa-font" aria-hidden="true"></i></button>
-		<!-- 移动 -->
-		<button disabled="disabled" id="move" class="tool" onclick="xmirror.move(this)" title="移动"><i class="fa fa-hand-paper-o" aria-hidden="true"></i></button>
-		<!-- 缩小 -->
-		<button disabled="disabled"  class="tool r" title="缩小"><i class="fa fa-search-minus" aria-hidden="true"></i></button>
-		<!-- 放大 -->
-		<button disabled="disabled"  class="tool r" title="放大"><i class="fa fa-search-plus" aria-hidden="true"></i></button>
-		
-	</div>
+	<webview id="settingPanel" src="http://www.bing.com" width="100%" height="100%"></webview>
 	<!-- 弹出框 -->
 	<div class="modal-bg" id="warning">
 		<article class="modal">
