@@ -77,12 +77,10 @@ function openSettingPanel(){
 	if(workPanel.style.display==='block'){
 		workPanel.style.display='none';
 		settingPanel.style.display='block';
-		// settingPanel.setAttribute('src','./partial/setting_panel.html');
 	}else{
 		workPanel.style.display='block';
 		settingPanel.style.display='none';
 	}
-	// window.open('http://www.bing.cn');
 }
 
 const warningMention={
