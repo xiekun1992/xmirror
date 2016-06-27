@@ -175,3 +175,22 @@ function sendPictureToDraw(event){
 ipcMain.on('x-picture-draw-end',()=>{
 	tmpWindow.show();
 });
+
+ipcMain.on('x-setting-panel-ready',(event)=>{
+	fs.readdir('../xmirror_workspace',(err,files)=>{
+		if(err){
+			throw err;	
+		}else{
+			console.log(files);
+			files.forEach((o,i)=>{
+				fs.stat('../xmirror_workspace/'+o,(err,stats)=>{
+					if(stats.isFile()){
+						console.log(o,' is a file.');
+					}else if(stats.isDirectory()){
+						console.log(o,' is a directory.');
+					}
+				});
+			});
+		}
+	});
+});

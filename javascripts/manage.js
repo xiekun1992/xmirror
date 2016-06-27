@@ -1,0 +1,1 @@
+ipcRenderer.send('x-setting-panel-ready');

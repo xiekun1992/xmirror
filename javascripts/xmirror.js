@@ -76,7 +76,8 @@ const workPanel=document.querySelector('#workPanel'),
 function openSettingPanel(){
 	if(workPanel.style.display==='block'){
 		workPanel.style.display='none';
-		settingPanel.style.display='block';
+		settingPanel.style.display='flex';
+		ipcRenderer.send('x-setting-panel-ready');
 	}else{
 		workPanel.style.display='block';
 		settingPanel.style.display='none';
@@ -170,6 +171,10 @@ function Xmirror(imgPath){
 	};
 	this.exportImage=function(specification){
 		console.log(specification)
+		rc.width=0;
+		rc.height=0;
+		rc.width=img.width;
+		rc.height=img.height;
 		rctx.drawImage(img,0,0);
 		if(specification.format==='image/jpg'){
 			return rc.toDataURL(specification.format,1);
