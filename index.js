@@ -182,15 +182,21 @@ ipcMain.on('x-setting-panel-ready',(event)=>{
 			throw err;	
 		}else{
 			console.log(files);
+			let filesInfo=[];
 			files.forEach((o,i)=>{
 				fs.stat('../xmirror_workspace/'+o,(err,stats)=>{
 					if(stats.isFile()){
 						console.log(o,' is a file.');
+						if(['jpg','png'].indexOf(o.split('.').pop())){
+							filesInfo.push({name:o,type:'image'});
+						}
 					}else if(stats.isDirectory()){
 						console.log(o,' is a directory.');
+						filesInfo.push({name:o,type:'folder'});
 					}
 				});
 			});
+			event.sender.send('x-setting-panel-list',{files:filesInfo});
 		}
 	});
 });
