@@ -54,7 +54,19 @@
 			
 		</div>
 	</div>
-	<webview id="settingPanel" src="./partials/setting_panel.html" style="display:none;"></webview>
+	<div id="settingPanel" style="display:none;">
+		<header>欢迎来到管理面板</header>
+		<nav>
+			<ul>
+				<li>我的图片</li>
+				<li>上传记录</li>
+				<li>下载记录</li>
+			</ul>
+		</nav>
+		<section id="pictureSquare">
+			
+		</section>
+	</div>
 	<!-- 弹出框 -->
 	<div class="modal-bg" id="warning">
 		<article class="modal">
@@ -73,5 +85,7 @@
 		</article>
 	</div>
 	<script src="./javascripts/xmirror.js"></script>
+	<script src="./javascripts/manage.js"></script>
+
 </body>
 </html>

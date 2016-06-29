@@ -73,11 +73,14 @@ function saveImage(){
 }
 const workPanel=document.querySelector('#workPanel'),
 	  settingPanel=document.querySelector('#settingPanel');
+ipcRenderer.on('x-setting-panel-ready',()=>{
+	console.log(1)
+});	  
 function openSettingPanel(){
 	if(workPanel.style.display==='block'){
 		workPanel.style.display='none';
 		settingPanel.style.display='flex';
-		ipcRenderer.send('x-setting-panel-ready');
+		// ipcRenderer.send('x-setting-panel-ready');
 	}else{
 		workPanel.style.display='block';
 		settingPanel.style.display='none';
