@@ -79,7 +79,7 @@ ipcRenderer.on('x-setting-panel-ready',()=>{
 function openSettingPanel(){
 	if(workPanel.style.display==='block'){
 		workPanel.style.display='none';
-		settingPanel.style.display='flex';
+		settingPanel.style.display='block';
 		// ipcRenderer.send('x-setting-panel-ready');
 	}else{
 		workPanel.style.display='block';
