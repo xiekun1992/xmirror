@@ -208,17 +208,21 @@ span.btn:hover{
     font-size: 14px;
     padding-top: 5px;
 }
+#pictureSquare article header{
+    padding-bottom: 10px;
+    text-align: left;
+}
 #pictureSquare article{
     text-align: center;
-    border: 1px solid transparent;
-    padding: 5px;
+    border: 1px solid #ddd;
+    padding: 10px;
     display: inline-block;
     margin: 0 10px 10px 0;
-    border-radius: 4px;
+    box-shadow: 0px 5px 10px #eee;
 }
 #pictureSquare article:hover {
-    background: linear-gradient(#fff 0,rgba(216, 225, 239, 0.47) 100%);
-    border: 1px solid rgb(196, 214, 243);
+    background: linear-gradient(#f9f6f6 0,rgba(235, 236, 236, 0.47) 100%);
+    border: 1px solid rgb(84, 133, 210);
 }
 #settingPanel{
     background: #fff;
@@ -269,4 +273,62 @@ span.btn:hover{
 #settingPanel>nav>ul>li:hover::after,
 #settingPanel>nav>ul>li.active::after {
     display: block;
+}
+
+.folder{
+    position: relative;
+    width: 78px;
+    height: 70px;
+    display: block;
+}
+.folder>.back-cover{
+    width: 78px;
+    height: 70px;
+    background: #ddd;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+.folder>.paper{
+    width: 73px;
+    height: 63px;
+    background: #ccc;
+    transform: skew(-6deg);
+    position: absolute;
+    bottom: 0;
+    right: 1px;
+    border: 1px solid #ababab;
+    border-radius: 2px;
+}
+.folder>.cover{
+    width: 77px;
+    height: 60px;
+    background: #ccc;
+    transform: skew(-10deg);
+    position: absolute;
+    bottom: 0;
+    right: -5px;
+    border: 2px solid #aaa;
+    border-radius: 4px;
+}
+.w90{
+    width: 90px;
+}
+.progress-bg{
+    display: inline-block;
+    width: 100%;
+    height: 5px;
+    background: #ddd;
+    border-radius: 4px;
+    position: relative;
+}
+.progress-bar{
+    display: inline-block;
+    height: 5px;
+    background: #11ca42;
+    width: 56%;
+    position: absolute;
+    border-radius: 4px;
 }

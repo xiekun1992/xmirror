@@ -6,18 +6,28 @@ ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 	data.files.forEach(function(o,i){
 		if(o.type!=='folder'){
 			html+="<article>"
-					+"<p>"
+					+"<div>"
 						+"<img src='"+o.path+"' width='100' height='100'>"
-					+"</p>"
+					+"</div>"
 					+"<footer>"
 						+o.name
 					+"</footer>"
 				+"</article>";
 		}else{
 			html+="<article>"
-					+"<p>"
-						+"<i class=\"fa fa-folder-o\" style=\"font-size:100px;\" ></i>"
-					+"</p>"
+					+"<header>"
+						+"<i class=\"fa fa-spinner\" style='display:none;'></i>"
+						+"<span class='progress-bg'>"
+							+"<span class='progress-bar'></span>"
+						+"</span>"
+					+"</header>"
+					+"<div class='w90'>"
+						+"<div class='folder'>"
+							+"<div class='back-cover'></div>"
+							+"<div class='paper'></div>"
+							+"<div class='cover'></div>"
+						+"</div>"
+					+"</div>"
 					+"<footer>"
 						+o.name
 					+"</footer>"
