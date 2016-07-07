@@ -244,18 +244,18 @@ span.btn:hover{
     padding: 5px 10px;
     border-bottom: 1px solid #ccc;
 }
-#settingPanel>nav>ul{
+#settingPanel>aside>ul{
     padding: 5px 10px 0 10px;
     margin: 0;
 }
-#settingPanel>nav>ul>li{
+#settingPanel>aside>ul>li{
     display: inline-block;
     padding: 0 10px 5px 10px;
     border: 1px solid #ddd;
     border-bottom: 0;
     position: relative;
 }
-#settingPanel>nav>ul>li:before{
+#settingPanel>aside>ul>li:before{
     content: ' ';
     border-top: 2px solid #ddd;
     display: block;
@@ -264,11 +264,11 @@ span.btn:hover{
     top: -1px;
     width: 100%;
 }
-#settingPanel>nav>ul>li:hover::before,
-#settingPanel>nav>ul>li.active::before {
+#settingPanel>aside>ul>li:hover::before,
+#settingPanel>aside>ul>li.active::before {
     border-top: 2px solid #f00;
 }
-#settingPanel>nav>ul>li:after {
+#settingPanel>aside>ul>li:after {
     content: ' ';
     display: none;
     width: 100%;
@@ -278,8 +278,8 @@ span.btn:hover{
     left: 0;
     bottom: -2px;
 }
-#settingPanel>nav>ul>li:hover::after,
-#settingPanel>nav>ul>li.active::after {
+#settingPanel>aside>ul>li:hover::after,
+#settingPanel>aside>ul>li.active::after {
     display: block;
 }
 
@@ -339,4 +339,16 @@ span.btn:hover{
     width: 56%;
     position: absolute;
     border-radius: 4px;
+}
+#navbar {
+    margin: 0 10px;
+    font-size: 14px;
+    padding: 5px 0;
+}
+#navbar a{
+    border-bottom: 2px solid #bbb;
+    margin-right: 5px;
+}
+#navbar a:hover{
+    border-bottom-color:#f00;
 }

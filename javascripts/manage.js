@@ -2,6 +2,12 @@
 ipcRenderer.send('x-setting-panel-ready');
 ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 	console.log(data);
+	let navs=data.nav.split('\\').slice(1);
+	let a="";
+	for(let n of navs){
+		a+="<a onclick='openFolder(\""+(data.nav.substring(0,data.nav.indexOf(n))+n).replace(/\\/g,'\\\\')+"\")'>"+n+"</a>";
+	}
+	navbar.innerHTML=a;
 	let html="";
 	data.files.forEach(function(o,i){
 		if(o.type!=='folder'){
@@ -60,7 +66,4 @@ function scaleImg(self){
 function openFolder(path){
 	console.log(path)
 	ipcRenderer.send('x-setting-panel-open-folder',{path:path});
-	ipcRenderer.on('x-setting-panel-enter-folder',(event,data)=>{
-
-	});
 }

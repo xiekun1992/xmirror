@@ -196,7 +196,7 @@ ipcMain.on('x-setting-panel-ready',(event)=>{
 					filesInfo.push({name:o,type:'folder',path:workspace+'\\'+o});
 				}
 			}
-			event.sender.send('x-setting-panel-list',{files:filesInfo});
+			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:workspace});
 		}
 	});
 });
@@ -219,7 +219,7 @@ ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 					filesInfo.push({name:o,type:'folder',path:workspace+'\\'+o});
 				}
 			}
-			event.sender.send('x-setting-panel-list',{files:filesInfo});
+			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:data.path});
 		}
 	});
 });
