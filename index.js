@@ -199,6 +199,11 @@ ipcMain.on('x-setting-panel-ready',(event)=>{
 			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:workspace});
 		}
 	});
+	event.sender.send('x-resize',{size:win.getSize()});
+	win.on('resize',()=>{
+		// console.log(win.getSize());
+		event.sender.send('x-resize',{size:win.getSize()});
+	});
 });
 ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 	console.log(data.path);

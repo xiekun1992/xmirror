@@ -1,5 +1,10 @@
-
+var htmlBody=document.querySelector('body');
 ipcRenderer.send('x-setting-panel-ready');
+ipcRenderer.on('x-resize',(event,data)=>{
+	console.log(data.size);
+	htmlBody.style.height=data.size[1]+'px';
+	document.querySelector('#pictureSquare').style.height=data.size[1]-123+'px';
+});
 ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 	console.log(data);
 	let navs=data.nav.split('\\').slice(1);

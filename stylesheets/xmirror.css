@@ -196,6 +196,12 @@ span.btn:hover{
 #pictureSquare{
     padding: 10px 0 0 10px;
     border-top: 1px solid #ddd;
+    overflow-y: scroll;
+}
+#pictureSquare:after{
+    content: '';
+    display: block;
+    clear: both;
 }
 #pictureSquare article p{
     overflow: visible;
@@ -272,11 +278,11 @@ span.btn:hover{
     content: ' ';
     display: none;
     width: 100%;
-    height: 4px;
+    height: 1px;
     position: absolute;
     background: #fff;
     left: 0;
-    bottom: -2px;
+    bottom: -1px;
 }
 #settingPanel>aside>ul>li:hover::after,
 #settingPanel>aside>ul>li.active::after {
