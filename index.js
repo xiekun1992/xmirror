@@ -207,24 +207,25 @@ ipcMain.on('x-setting-panel-ready',(event)=>{
 });
 ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 	console.log(data.path);
-	fs.readdir(data.path,(err,files)=>{
+	const path=data.path;
+	fs.readdir(path,(err,files)=>{
 		if(err){
 			throw err;
 		}else{
 			let filesInfo=[];
 			for(var o of files){
-				let stats=fs.statSync(workspace+'\\'+o);
+				let stats=fs.statSync(path+'\\'+o);
 				if(stats.isFile()){
 					// console.log(o,' is a file.');
 					if(['jpg','png'].indexOf(o.split('.').pop())!==-1){
-						filesInfo.push({name:o,type:'image',path:workspace+'\\'+o});
+						filesInfo.push({name:o,type:'image',path:path+'\\'+o});
 					}
 				}else if(stats.isDirectory()){
 					// console.log(o,' is a directory.');
-					filesInfo.push({name:o,type:'folder',path:workspace+'\\'+o});
+					filesInfo.push({name:o,type:'folder',path:path+'\\'+o});
 				}
 			}
-			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:data.path});
+			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:path});
 		}
 	});
 });

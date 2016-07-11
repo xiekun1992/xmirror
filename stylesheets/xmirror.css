@@ -352,9 +352,13 @@ span.btn:hover{
     padding: 5px 0;
 }
 #navbar a{
-    border-bottom: 2px solid #bbb;
+    color: #888;
     margin-right: 5px;
 }
+#navbar a:last-child,
 #navbar a:hover{
-    border-bottom-color:#f00;
+    color: #000
+}
+#navbar a:after {
+    content: ' \\ ';
 }
