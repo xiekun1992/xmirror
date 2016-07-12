@@ -16,7 +16,7 @@ ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 	let html="";
 	data.files.forEach(function(o,i){
 		if(o.type!=='folder'){
-			html+="<article>"
+			html+="<article onmousedown='showMenu(event,\""+o.path.replace(/\\/g,'\\\\')+"\")' ondblclick='openFileFn(\""+o.path.replace(/\\/g,'\\\\')+"\")'>"
 					+"<header>"
 						+"<i class=\"fa fa-spinner\" style='display:none;'></i>"
 						+"<span class='progress-bg'>"
@@ -67,8 +67,53 @@ function scaleImg(self){
 		self.style.width='auto';
 	}
 }
-
+// 双击打开文件夹
 function openFolder(path){
-	console.log(path)
+	// console.log(path)
 	ipcRenderer.send('x-setting-panel-open-folder',{path:path});
 }
+// 右键菜单
+let targetElement;//保存待操作的图片路径
+function showMenu(event,link){
+	let articles=document.querySelectorAll('#pictureSquare article');
+	for(let e in articles){
+		articles[e].classList && articles[e].classList.remove('active');
+	}
+ 	console.log(event);
+ 	if(event.button==2){
+ 		targetElement=link;
+ 		let path=event.path;
+ 		for(let e in path){
+ 			if(path[e].nodeName.toLowerCase()=='article'){
+ 				path[e].classList.add('active');
+ 				break;
+ 			}
+ 		}
+ 		rightMenu.style.left=event.pageX+10+'px';
+ 		rightMenu.style.top=event.pageY+10+'px';
+ 		rightMenu.style.display='block';
+ 		// rightMenu.addAttribute('index','-1');
+ 		pictureSquare.onmousewheel=function(){
+ 			return false;
+ 		};
+ 	}else{
+ 		targetElement=null;
+ 		// rightMenu.removeAttribute('index');
+ 		pictureSquare.onmousewheel=function(){
+ 			return true;
+ 		};
+ 		rightMenu.style.display='none';
+ 	}
+}
+// 右键菜单
+const openFileFn=()=>{
+
+};
+const uploadFn=()=>{
+
+};
+const openFilePositionFn=()=>{
+	if(targetElement){
+		alert(targetElement)
+	}
+};
