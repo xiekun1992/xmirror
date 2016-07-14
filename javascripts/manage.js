@@ -89,8 +89,18 @@ function showMenu(event,link){
  				break;
  			}
  		}
- 		rightMenu.style.left=event.pageX+10+'px';
- 		rightMenu.style.top=event.pageY+10+'px';
+ 		// 菜单位置靠左边
+ 		if(window.document.body.clientWidth-event.pageX<=110){
+ 			rightMenu.style.left=event.pageX-108-10+'px';
+ 		}else{
+ 			rightMenu.style.left=event.pageX+10+'px';
+ 		}
+ 		// 菜单位上边置靠
+ 		if(window.document.body.clientHeight-event.pageY<=170){
+ 			rightMenu.style.top=event.pageY-162-10+'px';
+ 		}else{
+ 			rightMenu.style.top=event.pageY+10+'px';
+ 		}
  		rightMenu.style.display='block';
  		// rightMenu.addAttribute('index','-1');
  		pictureSquare.onmousewheel=function(){
