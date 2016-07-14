@@ -4,7 +4,8 @@ const {
 	BrowserWindow,
 	ipcMain,
 	dialog,
-	globalShortcut
+	globalShortcut,
+	shell
 }=electron;
 
 const fs=require('fs');
@@ -228,4 +229,8 @@ ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 			event.sender.send('x-setting-panel-list',{files:filesInfo,nav:path});
 		}
 	});
+});
+// 
+ipcMain.on('x-menu-showiteminfolder',(event,path)=>{
+	shell.showItemInFolder(path);
 });
