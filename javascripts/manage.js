@@ -90,7 +90,7 @@ function showMenu(event,link){
  			}
  		}
  		// 菜单位置靠左边
- 		if(window.document.body.clientWidth-event.pageX<=110){
+ 		if(window.document.body.clientWidth-event.pageX<=120){
  			rightMenu.style.left=event.pageX-108-10+'px';
  		}else{
  			rightMenu.style.left=event.pageX+10+'px';
@@ -116,8 +116,13 @@ function showMenu(event,link){
  	}
 }
 // 右键菜单
-const openFileFn=()=>{
-
+const openFileFn=(path)=>{
+	var path=path||targetElement;
+	if(path){
+		// alert(targetElement)
+		rightMenu.style.display='none';
+		ipcRenderer.send('x-menu-openitem',path);
+	}
 };
 const uploadFn=()=>{
 
@@ -125,7 +130,7 @@ const uploadFn=()=>{
 const openFilePositionFn=()=>{
 	if(targetElement){
 		// alert(targetElement)
-		ipcRenderer.send('x-menu-showiteminfolder',targetElement);
 		rightMenu.style.display='none';
+		ipcRenderer.send('x-menu-showiteminfolder',targetElement);
 	}
 };

@@ -230,7 +230,10 @@ ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 		}
 	});
 });
-// 
+// 菜单右键
 ipcMain.on('x-menu-showiteminfolder',(event,path)=>{
 	shell.showItemInFolder(path);
+});
+ipcMain.on('x-menu-openitem',(event,path)=>{
+	shell.openItem(path);
 });

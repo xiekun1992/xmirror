@@ -397,6 +397,8 @@ span.btn:hover{
     border: 1px solid #ddd;
     font-size: 14px;
     box-shadow: 0 0 4px #ccc;
+    -webkit-user-select:none;
+    user-select:none;
 }
 #rightMenu ul{
     padding: 0;
