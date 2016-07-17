@@ -125,7 +125,11 @@ const openFileFn=(path)=>{
 	}
 };
 const uploadFn=()=>{
-
+	if(targetElement){
+		// alert(targetElement)
+		rightMenu.style.display='none';
+		ipcRenderer.send('x-menu-uploadfile',targetElement);
+	}
 };
 const openFilePositionFn=()=>{
 	if(targetElement){

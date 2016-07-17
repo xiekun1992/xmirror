@@ -9,6 +9,7 @@ const {
 }=electron;
 
 const fs=require('fs');
+const http=require('http');
 
 let win;
 
@@ -236,4 +237,37 @@ ipcMain.on('x-menu-showiteminfolder',(event,path)=>{
 });
 ipcMain.on('x-menu-openitem',(event,path)=>{
 	shell.openItem(path);
+});
+ipcMain.on('x-menu-uploadfile',(event,path)=>{
+	let boundaryKey='----'+Date.now();
+	let options={
+		host:'http://localhost:3000',
+		port:80,
+		method:'POST',
+		path:'/images',
+		headers:{
+			'Content-Type':'multipart/form-data; boundary='+boundaryKey,
+			'Connection':'keep-alive'
+		}
+	};
+
+	let req=http.request(options,(res)=>{
+		res.setEncoding('utf8');
+		res.on('data',(chunk)=>{
+			console.log('body: '+chunk);
+		});
+		res.on('end',()=>{
+			console.log('res end');
+		});
+	});
+
+	req.write('-'+boundaryKey+'\r\n'+
+			  'Content-Disposition:form-data;name="file";filename="'+
+			  path.split('\\').pop()+'"\r\n'+
+			  'Content-Type:application/x-zip-compressed\r\n\r\n');
+	let fileStream=fs.createReadStream(path,{bufferSize:1024*1024});
+	fileStream.pipe(req,{end:false});
+	fileStream.on('end',()=>{
+		req.end('\r\n-'+boundaryKey+'-');
+	})
 });
