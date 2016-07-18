@@ -241,8 +241,8 @@ ipcMain.on('x-menu-openitem',(event,path)=>{
 ipcMain.on('x-menu-uploadfile',(event,path)=>{
 	let boundaryKey='----'+Date.now();
 	let options={
-		host:'http://localhost:3000',
-		port:80,
+		host:'127.0.0.1',
+		port:3000,
 		method:'POST',
 		path:'/images',
 		headers:{
