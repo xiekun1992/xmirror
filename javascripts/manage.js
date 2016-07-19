@@ -121,6 +121,9 @@ const openFileFn=(path)=>{
 	if(path){
 		// alert(targetElement)
 		rightMenu.style.display='none';
+		pictureSquare.onmousewheel=function(){
+ 			return true;
+ 		};
 		ipcRenderer.send('x-menu-openitem',path);
 	}
 };
@@ -128,6 +131,9 @@ const uploadFn=()=>{
 	if(targetElement){
 		// alert(targetElement)
 		rightMenu.style.display='none';
+		pictureSquare.onmousewheel=function(){
+ 			return true;
+ 		};
 		ipcRenderer.send('x-menu-uploadfile',targetElement);
 	}
 };
@@ -135,6 +141,9 @@ const openFilePositionFn=()=>{
 	if(targetElement){
 		// alert(targetElement)
 		rightMenu.style.display='none';
+		pictureSquare.onmousewheel=function(){
+ 			return true;
+ 		};
 		ipcRenderer.send('x-menu-showiteminfolder',targetElement);
 	}
 };

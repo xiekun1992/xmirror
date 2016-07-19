@@ -10,6 +10,8 @@
   "author": "xiekun1992",
   "license": "ISC",
   "dependencies": {
-    "font-awesome": "^4.6.3"
+    "font-awesome": "^4.6.3",
+    "node-uuid": "^1.4.7",
+    "request": "^2.73.0"
   }
 }

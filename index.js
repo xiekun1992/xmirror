@@ -10,6 +10,7 @@ const {
 
 const fs=require('fs');
 const http=require('http');
+const path=require('path');
 
 let win;
 
@@ -26,7 +27,7 @@ function createWindow(){
 	});
 	win.loadURL(`file://${__dirname}/index.html`);
 	
-	win.webContents.openDevTools();
+	// win.webContents.openDevTools();
 
 	win.on('closed',()=>{
 		win=null;
@@ -238,36 +239,27 @@ ipcMain.on('x-menu-showiteminfolder',(event,path)=>{
 ipcMain.on('x-menu-openitem',(event,path)=>{
 	shell.openItem(path);
 });
+const request = require('request');
+const uuid = require('node-uuid');
 ipcMain.on('x-menu-uploadfile',(event,path)=>{
-	let boundaryKey='----'+Date.now();
-	let options={
-		host:'127.0.0.1',
-		port:3000,
-		method:'POST',
-		path:'/images',
-		headers:{
-			'Content-Type':'multipart/form-data; boundary='+boundaryKey,
-			'Connection':'keep-alive'
-		}
-	};
-
-	let req=http.request(options,(res)=>{
-		res.setEncoding('utf8');
-		res.on('data',(chunk)=>{
-			console.log('body: '+chunk);
-		});
-		res.on('end',()=>{
-			console.log('res end');
-		});
-	});
-
-	req.write('-'+boundaryKey+'\r\n'+
-			  'Content-Disposition:form-data;name="file";filename="'+
-			  path.split('\\').pop()+'"\r\n'+
-			  'Content-Type:application/x-zip-compressed\r\n\r\n');
-	let fileStream=fs.createReadStream(path,{bufferSize:1024*1024});
-	fileStream.pipe(req,{end:false});
-	fileStream.on('end',()=>{
-		req.end('\r\n-'+boundaryKey+'-');
-	})
+	let uploadId=uuid.v4();
+	let r=request.post('http://localhost:3000/images?uploadId='+uploadId);
+	let form=r.form();
+	// form.append('buffer',new Buffer(1024*1024));
+	form.append('img',fs.createReadStream(path));
+	// form.append('uploadId',uploadId);
+	// 请求进度
+	let timer=setInterval(function(){
+		request('http://localhost:3000/images/'+uploadId+'/progress',(err,res,body)=>{
+			if(err){
+				throw err;	
+			}else{
+				console.log(body);
+				var result=JSON.parse(body);
+				if(result.code==1004){
+					clearInterval(timer);
+				}
+			}
+		})
+	},10);
 });
