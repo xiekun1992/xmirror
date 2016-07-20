@@ -1,3 +1,5 @@
+const uuid = require('node-uuid');
+
 var htmlBody=document.querySelector('body');
 ipcRenderer.send('x-setting-panel-ready');
 ipcRenderer.on('x-resize',(event,data)=>{
@@ -15,8 +17,9 @@ ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 	navbar.innerHTML=a;
 	let html="";
 	data.files.forEach(function(o,i){
+		let uploadId=uuid.v4();
 		if(o.type!=='folder'){
-			html+="<article onmousedown='showMenu(event,\""+o.path.replace(/\\/g,'\\\\')+"\")' ondblclick='openFileFn(\""+o.path.replace(/\\/g,'\\\\')+"\")'>"
+			html+="<article id='"+uploadId+"' onmousedown='showMenu(event,\""+o.path.replace(/\\/g,'\\\\')+"\",\""+uploadId+"\")' ondblclick='openFileFn(\""+o.path.replace(/\\/g,'\\\\')+"\")'>"
 					+"<header>"
 						+"<i class=\"fa fa-spinner\" style='display:none;'></i>"
 						+"<span class='progress-bg'>"
@@ -31,7 +34,7 @@ ipcRenderer.on('x-setting-panel-list',(event,data)=>{
 					+"</footer>"
 				+"</article>";
 		}else{
-			html+="<article ondblclick='openFolder(\""+o.path.replace(/\\/g,'\\\\')+"\")'>"
+			html+="<article id='"+uploadId+"' ondblclick='openFolder(\""+o.path.replace(/\\/g,'\\\\')+"\")'>"
 					+"<header>"
 						+"<i class=\"fa fa-spinner\" style='display:none;'></i>"
 						+"<span class='progress-bg'>"
@@ -73,15 +76,16 @@ function openFolder(path){
 	ipcRenderer.send('x-setting-panel-open-folder',{path:path});
 }
 // 右键菜单
-let targetElement;//保存待操作的图片路径
-function showMenu(event,link){
+let targetElements=[];//保存待操作的图片路径
+function showMenu(event,link,uploadId){
 	let articles=document.querySelectorAll('#pictureSquare article');
 	for(let e in articles){
 		articles[e].classList && articles[e].classList.remove('active');
 	}
  	console.log(event);
+	targetElements.length=0;
  	if(event.button==2){
- 		targetElement=link;
+ 		targetElements.push({link:link,uploadId:uploadId});
  		let path=event.path;
  		for(let e in path){
  			if(path[e].nodeName.toLowerCase()=='article'){
@@ -107,7 +111,6 @@ function showMenu(event,link){
  			return false;
  		};
  	}else{
- 		targetElement=null;
  		// rightMenu.removeAttribute('index');
  		pictureSquare.onmousewheel=function(){
  			return true;
@@ -116,10 +119,10 @@ function showMenu(event,link){
  	}
 }
 // 右键菜单
+// 打开文件
 const openFileFn=(path)=>{
-	var path=path||targetElement;
+	var path=path||targetElements[0].link;
 	if(path){
-		// alert(targetElement)
 		rightMenu.style.display='none';
 		pictureSquare.onmousewheel=function(){
  			return true;
@@ -127,23 +130,28 @@ const openFileFn=(path)=>{
 		ipcRenderer.send('x-menu-openitem',path);
 	}
 };
+// 上传
 const uploadFn=()=>{
-	if(targetElement){
-		// alert(targetElement)
+	if(targetElements.length>0){
 		rightMenu.style.display='none';
 		pictureSquare.onmousewheel=function(){
  			return true;
  		};
-		ipcRenderer.send('x-menu-uploadfile',targetElement);
+		ipcRenderer.send('x-menu-uploadfile',targetElements);
 	}
 };
+// 显示上传进度
+ipcRenderer.on('x-menu-progress',(event,element)=>{
+	console.log(element.progress)
+	document.getElementById(''+element.uploadId).children[0].children[1].children[0].style.width=element.progress+'%';
+});
+// 打开文件位置
 const openFilePositionFn=()=>{
-	if(targetElement){
-		// alert(targetElement)
+	if(targetElements.length>0){
 		rightMenu.style.display='none';
 		pictureSquare.onmousewheel=function(){
  			return true;
  		};
-		ipcRenderer.send('x-menu-showiteminfolder',targetElement);
+		ipcRenderer.send('x-menu-showiteminfolder',targetElements);
 	}
 };

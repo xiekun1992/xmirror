@@ -366,7 +366,7 @@ span.btn:hover{
     display: inline-block;
     height: 5px;
     background: #11ca42;
-    width: 56%;
+    width: 0%;
     position: absolute;
     border-radius: 4px;
 }

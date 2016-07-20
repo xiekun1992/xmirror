@@ -233,33 +233,43 @@ ipcMain.on('x-setting-panel-open-folder',(event,data)=>{
 	});
 });
 // 菜单右键
-ipcMain.on('x-menu-showiteminfolder',(event,path)=>{
-	shell.showItemInFolder(path);
+ipcMain.on('x-menu-showiteminfolder',(event,elements)=>{
+	for(let e of elements){
+		shell.showItemInFolder(e.link);
+	}
 });
 ipcMain.on('x-menu-openitem',(event,path)=>{
 	shell.openItem(path);
 });
 const request = require('request');
-const uuid = require('node-uuid');
-ipcMain.on('x-menu-uploadfile',(event,path)=>{
-	let uploadId=uuid.v4();
-	let r=request.post('http://localhost:3000/images?uploadId='+uploadId);
-	let form=r.form();
-	// form.append('buffer',new Buffer(1024*1024));
-	form.append('img',fs.createReadStream(path));
-	// form.append('uploadId',uploadId);
-	// 请求进度
-	let timer=setInterval(function(){
-		request('http://localhost:3000/images/'+uploadId+'/progress',(err,res,body)=>{
-			if(err){
-				throw err;	
-			}else{
-				console.log(body);
-				var result=JSON.parse(body);
-				if(result.code==1004){
-					clearInterval(timer);
-				}
-			}
-		})
-	},10);
+ipcMain.on('x-menu-uploadfile',(event,elements)=>{
+	for(let e of elements){
+		let uploadId=e.uploadId;
+		let r=request.post('http://localhost:3000/images?uploadId='+uploadId);
+		let form=r.form();
+		// form.append('buffer',new Buffer(1024*1024));
+		form.append('img',fs.createReadStream(e.link));
+		// form.append('uploadId',uploadId);
+		// 请求进度
+		let eProgress={uploadId:uploadId,progress:0};
+		polling(event,uploadId,eProgress);
+	}
 });
+
+const polling=(event,uploadId,eProgress)=>{
+	request('http://localhost:3000/images/'+uploadId+'/progress',(err,res,body)=>{
+		if(err){
+			throw err;	
+		}else{
+			var result=JSON.parse(body);
+			if(result.msg>eProgress.progress){
+				eProgress.progress=result.msg;
+				event.sender.send('x-menu-progress',eProgress);
+			}
+			// console.log(body);
+			if(result.code!=1004){
+				polling(event,uploadId,eProgress);
+			}
+		}
+	})
+}
